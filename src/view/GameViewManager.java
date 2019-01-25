@@ -28,6 +28,8 @@ public class GameViewManager {
 	private int numberOfPlayers;
 	private AnimationTimer gameTimer;
 	
+	private boolean paused;
+	
 	public GameViewManager() {
 		initializeStage();
 	}
@@ -42,6 +44,7 @@ public class GameViewManager {
 	
 
 	private void createGameElements(int numberOfPlayers) {
+		paused = false;
 		game = new Scrabble(numberOfPlayers, gamePane);
 	}
 	
@@ -57,13 +60,21 @@ public class GameViewManager {
 		
 	}
 	
-	
+	private void endGame() {
+		game.endGame();
+		paused = true;
+	}
 	private void createGameLoop() {
 		gameTimer = new AnimationTimer() {
 
 			@Override
 			public void handle(long now) {
-			
+				if (!paused) {
+					if (!game.playingPhase()) {
+						System.out.println("ENDING");
+						endGame();
+					}
+				}
 			}
 		};
 		gameTimer.start();

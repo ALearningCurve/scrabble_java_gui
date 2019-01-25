@@ -19,6 +19,9 @@ public class Scrabble {
 	public final static String FILE = "src/application/backend/scrabbledictionary/Collins Scrabble Words (2015).txt";
 	
 	private AnchorPane gamePane;
+	
+	private int locationInLoop;
+	private int consecutiveScoreless;
 
 	/**
 	 * Constructor for scrabble, initializes variables
@@ -50,11 +53,7 @@ public class Scrabble {
 		pile = new Pile();  // New Pile object
 		board = new Board(gamePane);  // New Board object
 		makePlayers(); // Makes players
-		
-		playingPhase(); // Starts the game loop 
-		System.out.println("--------|| PLAYING PHASE OVER ||--------");
-		endGame(); // Ends the game and calculates the final scores for the players
-		System.out.println("game over");
+		consecutiveScoreless = 0;
 	}
 	
     /*Function to sort array using insertion sort*/
@@ -106,7 +105,7 @@ public class Scrabble {
 	 * Ends the game by finding the final score for the player
 	 * Should loop through the player array and print out their scores and then get the #1 winner
 	 */
-	private void endGame() {
+	public void endGame() {
 		// This part below is for making the player have the adjusted value minus that of the cards in the hand
 		int adder, totalScores=0, locEmptyHand = -1;
 		
@@ -164,9 +163,8 @@ public class Scrabble {
 	 * will end
 	 * @author 21wwalling-sotolongo
 	 */
-	private void playingPhase() {
-		int consecutiveScoreless = 0;
-		while (6 != consecutiveScoreless) { // Loops until the players forfeits 6x or player hand & pile are empty
+	public boolean playingPhase() {
+		if (6 != consecutiveScoreless) { // Loops until the players forfeits 6x or player hand & pile are empty
 			for (Player player:players) {
 				System.out.println("Its " + player.getName() + "\'s (" + player.getScore() +" pts.) turn! \n\n" );
 				if (player.takeTurn(board, pile) == 0) {
@@ -177,12 +175,14 @@ public class Scrabble {
 				}
 				if (!player.getHand().checkIfEmpty() && pile.getSize() == 0) { // If the pile is empty and one of the hands is empty then the game is ended
 					System.out.println("ALERT-----\n " + player.getName() + " has emptied their hand\n---------");
-					return;
+					return false;
 				}
 				
 			}
+		} else {
+			return false;
 		}
-		System.out.println("EXITING");
+		return true;
 	}
 	
 	/**

@@ -14,7 +14,7 @@ public class Player
 	private static int numPlayers = 0; // Class variable that increases for each player made
 	private int score = 0; // Players score
 	private Scanner sc = new Scanner(System.in); // Scanner used to get user input
-	
+
 	/**
 	 * Constructor for the Player class that creates player with the name given
 	 * @param name the name for the player object
@@ -74,6 +74,7 @@ public class Player
 			
 			while(hand.checkIfEmpty()){ // Lets the player put down the letters onto the board
 				board.printStatus();
+				board.printStatus(true);
 				int index = readInt(-1,6, "Enter the index of the card to be played (-1 to forfeit turn)"); // Ask for the card in the hand to be placed
 				
 				if (index == -1) {
@@ -112,6 +113,7 @@ public class Player
 			}
 			System.out.println("\nEnd of turn board:");
 			board.printStatus();
+			board.printStatus(true);
 			
 			
 			// --------

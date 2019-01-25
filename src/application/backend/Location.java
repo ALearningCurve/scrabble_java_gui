@@ -26,21 +26,25 @@ public class Location extends Button{
 	private final String BUTTON_PRESSED_STYLE = "-fx-background-color: transparent; -fx-background-image: url('view/resources/scrabbletiles/scrabble_board_peice_selected.png');";
 	private final String BUTTON_FREE_STYLE = "-fx-background-color: transparent; -fx-background-image: url('view/resources/scrabbletiles/scrabble_board_peice.png');";
 	
-	private final static int dimension = 40;
+	public final static int HEIGHT = 45;
+	public final static int WIDTH = 49;
 	
 	/**
 	 * Location constructor. 
 	 * @author 21wwalling-sotolongo
 	 */
 	public Location() {
-		setText("l");
+		setText(this.toString());
 		setButtonFont();
-		setPrefWidth(dimension);
-		setPrefHeight(dimension);
+		setPrefWidth(WIDTH);
+		setPrefHeight(HEIGHT);
 		setStyle(BUTTON_FREE_STYLE);
 		initializeButtonListeners();
 	}
 	
+	public void updateTextOnButton() {
+		setText(this.toString());
+	}
 	/**
 	 * Resets the values of the location to be EMPTY and have no letter (letter variable set to null)
 	 * And returns the letter which the location previously had

@@ -29,10 +29,10 @@ public class Board {
 	    for (int col=0; col<NUM_COLS; col++){
 	        for (int row=0; row<NUM_ROWS; row++){
 	            grid[col][row] = new Location();
-	            grid[col][row].setLayoutX(50);
-	            grid[col][row].setLayoutY(50);
+	            grid[col][row].setLayoutY(Location.WIDTH/2 + col * Location.WIDTH);
+	            grid[col][row].setLayoutX(Location.HEIGHT/2 + row * Location.HEIGHT);
 	            gamePane.getChildren().add(grid[col][row]);
-	            System.out.println(gamePane.getChildren());
+	            // System.out.println(gamePane.getChildren());
 	        }
 	    }
 	    this.gamePane = gamePane;
@@ -190,15 +190,14 @@ public class Board {
 	
 		for (int row=0; row<NUM_ROWS; row++){
 	        for (int col=0; col<NUM_COLS; col++){
-	            loc = grid[row][col];
-	            
-	            //letter = loc.getLetter();
-	            //stat = loc.getStatus();
-	             
-	            
+	            loc = grid[row][col]; 
+	            loc.updateTextOnButton();
 	        }
-	        System.out.println(); // Make new line at the end
 	    } 
+	}
+	
+	public void printStatus(boolean bol) {
+		printStatus(gamePane);
 	}
 	
 	
