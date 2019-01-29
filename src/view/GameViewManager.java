@@ -20,8 +20,10 @@ public class GameViewManager {
 	
 	private final static String BACKGROUND_IMAGE = "view/resources/yellow_panel.png";
 	
-	private static final int GAME_HEIGHT = 768;
+	private static final int GAME_HEIGHT = 1392;
 	private static final int GAME_WIDTH= 1024;
+	private int counter = 0;
+	private boolean loaded = false;
 	
 	private Scrabble game;
 	private Stage menuStage;
@@ -55,8 +57,8 @@ public class GameViewManager {
 		
 		
 		gameStage.show();
-		createGameLoop();
 		createGameElements(numberOfPlayers);
+		createGameLoop();
 		
 	}
 	
@@ -65,15 +67,24 @@ public class GameViewManager {
 		paused = true;
 	}
 	private void createGameLoop() {
+		loaded = false; // This exists to give the game elements time to load in the beginning before the player turn happens
+		System.out.println("Loading...");
+		counter = 0;
 		gameTimer = new AnimationTimer() {
-
+			
 			@Override
 			public void handle(long now) {
-				if (!paused) {
-					if (!game.playingPhase()) {
-						System.out.println("ENDING");
+				if (!paused && loaded) {
+					System.out.println("ROUND----------------------------------- \nStarting new playing phase \n-----------------------------------");
+					if (!game.playingPhase()) { // If the playing phase detects that the game has ended it will return false
+						System.out.println("ENDING----------------------------------- \n 	Game has ended \n ----------------------------------- ");
 						endGame();
 					}
+				} else if (counter < 100){
+					counter ++;
+					if (counter % 10 == 0) { System.out.println("	" + counter + "%"); }
+				} else if (counter >= 1){
+					loaded = true;
 				}
 			}
 		};

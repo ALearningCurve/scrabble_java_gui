@@ -151,7 +151,7 @@ public class Scrabble {
 		
 		players = new Player[numPlayers];
 		for (int i=0; i<numPlayers; i++) {
-			System.out.println("Adding player " + (1+i));
+			System.out.println("Making player [" + (1+i) + "]");
 			players[i] = new Player();
 			players[i].fillHand(pile);
 		}

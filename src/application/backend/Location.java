@@ -131,6 +131,8 @@ public class Location extends Button{
 		setLayoutY(getLayoutY() - 4);
 	}
 	
+	
+	
 	private void initializeButtonListeners() {
 		
 		
@@ -157,7 +159,7 @@ public class Location extends Button{
 			@Override
 			public void handle(MouseEvent event) {
 				setEffect(new DropShadow());
-				setButtonPressedStyle();
+				setStyle(BUTTON_PRESSED_STYLE);
 			}
 		});
 		
@@ -166,7 +168,7 @@ public class Location extends Button{
 			@Override
 			public void handle(MouseEvent event) {
 				setEffect(null);
-				setButtonReleasedStyle();
+				setStyle(BUTTON_FREE_STYLE);
 			}
 		});
 	}	
