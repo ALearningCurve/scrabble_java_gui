@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.util.*;
 
 import javafx.scene.layout.AnchorPane;
+import view.GameViewManager;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -19,20 +20,21 @@ public class Scrabble {
 	public final static String FILE = "src/application/backend/scrabbledictionary/Collins Scrabble Words (2015).txt";
 	
 	private AnchorPane gamePane;
+	private GameViewManager view;
 	
-	private int locationInLoop;
 	private int consecutiveScoreless;
-
+	private int locationInPlayerList;
 	/**
 	 * Constructor for scrabble, initializes variables
 	 * @param numPlayers the number of players playing
 	 */
-	public Scrabble(int numPlayers, AnchorPane gamePane) {
+	public Scrabble(int numPlayers, AnchorPane gamePane, GameViewManager view) {
 		if (numPlayers <= 0) {
 			numPlayers = 1;
 		}
 		this.numPlayers = numPlayers;
 		this.gamePane = gamePane;
+		this.view = view;
 		gameLoop();
 	}
 	
@@ -54,6 +56,7 @@ public class Scrabble {
 		board = new Board(gamePane);  // New Board object
 		makePlayers(); // Makes players
 		consecutiveScoreless = 0;
+		
 	}
 	
     /*Function to sort array using insertion sort*/
@@ -152,10 +155,13 @@ public class Scrabble {
 		players = new Player[numPlayers];
 		for (int i=0; i<numPlayers; i++) {
 			System.out.println("Making player [" + (1+i) + "]");
-			players[i] = new Player();
+			players[i] = new Player(gamePane);
 			players[i].fillHand(pile);
 		}
+		locationInPlayerList = 0;
 	}
+	
+	
 	/**
 	 * Represents what happens during the playing phase of the game
 	 * Players get to play tiles until pile and a player's hand are empty and/or there is 6 consecutive forfiet
@@ -165,26 +171,32 @@ public class Scrabble {
 	 */
 	public boolean playingPhase() {
 		if (6 != consecutiveScoreless) { // Loops until the players forfeits 6x or player hand & pile are empty
-			for (Player player:players) {
-				System.out.println("Its " + player.getName() + "\'s (" + player.getScore() +" pts.) turn! \n\n" );
-				if (player.takeTurn(board, pile) == 0) {
-					consecutiveScoreless ++;
-					System.out.println("ALERT-----\n " + (6 - consecutiveScoreless) + " forfeits left\n---------");
-				} else {
-					consecutiveScoreless = 0;
-				}
-				if (!player.getHand().checkIfEmpty() && pile.getSize() == 0) { // If the pile is empty and one of the hands is empty then the game is ended
-					System.out.println("ALERT-----\n " + player.getName() + " has emptied their hand\n---------");
-					return false;
-				}
-				
+			Player player = players[locationInPlayerList];
+			System.out.println("Its " + player.getName() + "\'s (" + player.getScore() +" pts.) turn! \n\n" );
+			if (player.takeTurn(board, pile, view) == 0) {
+				consecutiveScoreless ++;
+				System.out.println("ALERT-----\n " + (6 - consecutiveScoreless) + " forfeits left\n---------");
+			} else {
+				consecutiveScoreless = 0;
 			}
+			if (!player.getHand().checkIfEmpty() && pile.getSize() == 0) { // If the pile is empty and one of the hands is empty then the game is ended
+				System.out.println("ALERT-----\n " + player.getName() + " has emptied their hand\n---------");
+				return false;
+			}
+			
 		} else {
 			return false;
 		}
+		updateLocationInPlayerList();
 		return true;
 	}
 	
+	private void updateLocationInPlayerList() {
+		locationInPlayerList ++;
+		if (locationInPlayerList >= players.length){
+			locationInPlayerList = 0;
+		}
+	}
 	/**
 	 * Looks through the FILE variable in the class which is a list of the valid scrabble words
 	 * and if the word is a valid choice, a boolean will return true if the word is valid and false otherwise
@@ -223,5 +235,9 @@ public class Scrabble {
 	
 	public Board getBoard() {
 		return board;
+	}
+	
+	public GameViewManager getView() {
+		return view;
 	}
 }

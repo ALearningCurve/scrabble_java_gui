@@ -5,6 +5,8 @@
  */
 package application.backend;
 import javafx.scene.layout.AnchorPane;
+import view.GameViewManager;
+
 import java.util.*;
 
 public class Player 
@@ -15,15 +17,19 @@ public class Player
 	private int score = 0; // Players score
 	private Scanner sc = new Scanner(System.in); // Scanner used to get user input
 
+	@SuppressWarnings("unused")
+	private AnchorPane gamePane;
+	
 	/**
 	 * Constructor for the Player class that creates player with the name given
 	 * @param name the name for the player object
 	 * @author 21wwalling-sotolongo
 	 */
-	public Player(String name) {
+	public Player(String name, AnchorPane gamePane) {
 		numPlayers ++;
 		this.name = name;
 		this.hand = new Hand();
+		this.gamePane = gamePane;
 	}
 	
 	/**
@@ -31,10 +37,11 @@ public class Player
 	 * playes
 	 * @author 21wwalling-sotolongo
 	 */
-	public Player() {
+	public Player(AnchorPane gamePane) {
 		numPlayers ++;
 		this.name = "Player " + numPlayers; 
 		this.hand = new Hand();
+		this.gamePane = gamePane;
 	}
 	
 	/**
@@ -45,6 +52,60 @@ public class Player
 	public void fillHand(Pile pile) {
 		pile.dealStart(hand);
 	}
+	
+	
+	
+	/**
+	 * Part of the turn where the player enters locations for their tiles to be played and entered
+	 * @param board Board object where the plays are put
+	 * @param locationsOfTurns ArrayList<int[]> where the player has put thier turns
+	 * @param blankIndexes ArrayList<Integer> Index in hand where the blank came from
+	 * @return
+	 */
+	private int playTiles (Board board, ArrayList<int[]> locationsOfTurns, ArrayList<Integer> blankIndexes) {
+		while(hand.checkIfEmpty()){ // Lets the player put down the letters onto the board
+			board.printStatus();
+			board.printStatus(true);
+			int index = readInt(-1,6, "Enter the index of the card to be played (-1 to forfeit turn)"); // Ask for the card in the hand to be placed
+			
+			if (index == -1) {
+				System.out.println("\nFORFEIT----------------------------------- \n\tYour turn has been forfieted, returning cards to hand! \n ----------------------------------------");
+				returnTilesToHandFromBoard(board, locationsOfTurns, blankIndexes);
+				return 0;
+			}
+			if (hand.getLetterIndex(index) == null) {
+				System.out.println("\nERROR---------------------------------- \n\tThat tile has already been played\n ----------------------------------------");
+				continue;
+			} else if (hand.getLetterIndex(index).getCharacter() == ' ') { // Checks if the letter at that index is a blank, and if so then it sets it to something else
+				System.out.println("You are playing a blank!");
+				hand.getLetterIndex(index).setBlankValue(sc);
+				blankIndexes.add(index);
+			}
+			
+			int col = readInt(0,14, "Enter the column for the letter to go") ;  // Ask for the x coordinate
+			int row = readInt(0,14, "Enter the row for the letter to go") ; // Ask for the y coordinate
+			
+			if (board.get(col, row).getStatus() == Location.EMPTY) {// Removes the letter and plays it if there is no letter on that spot
+				Letter letter = hand.remove(index);
+				board.setLetter(col, row, letter);
+			} else { // If there is a letter on that spot then it tells player and continues
+				System.out.println("\nERROR---------------------------------- \n\tYou cannot play over the same tile!\n ----------------------------------------");
+				continue;
+			}
+			
+			// Updates the hashmap with values of where the tiles have been placed
+			locationsOfTurns.add(new int[]{col, row, index});
+			
+			// Checks if the user's turn is over or not
+			if (readInt("Done with your turn? (0 is yes)") == 0) {
+				break;
+			}
+			System.out.println("This is now your hand:\n"  + hand );
+			
+		}
+		return 1;
+	}
+
 	/**
 	 * Take the input from the player to get the letter from their hand, remove it, and put it to 
 	 * the location on the board that is designated by user input. This repeats until the hand is either empty 
@@ -60,113 +121,109 @@ public class Player
 	 * @return the value of the player's turn
 	 * @author 21wwalling-sotolongo
 	 */
-	public int takeTurn(Board board, Pile pile) {
+	
+	public int takeTurn(Board board, Pile pile, GameViewManager view) {
 		ArrayList<int[]> locationsOfTurns; // Keeps tracj of the indexes and the locations of all the moves
 		String[][] collection; // Collection of all the words that are on the grid
-		ArrayList<String> finalWords, badWords; // This is a list of the individual words and badWords are the words that are invalid
+		ArrayList<String> finalWords = new ArrayList<String>(), badWords = new ArrayList<String>(); // This is a list of the individual words and badWords are the words that are invalid
 		ArrayList<Integer> blankIndexes; // Keeps track of indexes of blanks so that later it can be used to return invalid moves with blanks
-		boolean reloop;
-		while (true) { // While loop to keep the turn going until the player finishes playing tokens and words foind to legit
-			reloop = false;
+		
+			
 			locationsOfTurns = new ArrayList<int[]>(); // Initiallizes and Resets the list
 			blankIndexes = new ArrayList<Integer>();  // Initiallizes and Resets the list
 			System.out.println("This is your hand:\n"  + hand );
 			
-			while(hand.checkIfEmpty()){ // Lets the player put down the letters onto the board
-				board.printStatus();
-				board.printStatus(true);
-				int index = readInt(-1,6, "Enter the index of the card to be played (-1 to forfeit turn)"); // Ask for the card in the hand to be placed
-				
-				if (index == -1) {
-					System.out.println("\nFORFEIT----------------------------------- \n\tYour turn has been forfieted, returning cards to hand! \n ----------------------------------------");
-					returnTilesToHandFromBoard(board, locationsOfTurns, blankIndexes);
-					return 0;
-				}
-				if (hand.getLetterIndex(index) == null) {
-					System.out.println("\nERROR---------------------------------- \n\tThat tile has already been played\n ----------------------------------------");
-					continue;
-				} else if (hand.getLetterIndex(index).getCharacter() == ' ') { // Checks if the letter at that index is a blank, and if so then it sets it to something else
-					System.out.println("You are playing a blank!");
-					hand.getLetterIndex(index).setBlankValue(sc);
-					blankIndexes.add(index);
-				}
-				
-				int col = readInt(0,14, "Enter the column for the letter to go") ;  // Ask for the x coordinate
-				int row = readInt(0,14, "Enter the row for the letter to go") ; // Ask for the y coordinate
-				
-				if (board.get(col, row).getStatus() == Location.EMPTY) {// Removes the letter and plays it if there is no letter on that spot
-					Letter letter = hand.remove(index);
-					board.setLetter(col, row, letter);
-				} else { // If there is a letter on that spot then it tells player and continues
-					System.out.println("\nERROR---------------------------------- \n\tYou cannot play over the same tile!\n ----------------------------------------");
-					continue;
-				}
-				
-				// Updates the hashmap with values of where the tiles have been placed
-				locationsOfTurns.add(new int[]{col, row, index});
-				
-				// Checks if the user's turn is over or not
-				if (readInt("Done with your turn? (0 is yes)") == 0) {
-					break;
-				}
-				System.out.println("This is now your hand:\n"  + hand );
+			if (playTiles(board, locationsOfTurns, blankIndexes) == 0) {
+				return 0;
 			}
+			
 			System.out.println("\nEnd of turn board:");
 			board.printStatus();
 			board.printStatus(true);
 			
-			
-			// --------
-			// This is the logic for finding words and making sure that the play was a valid one
-			int lastCol, lastRow;
-			lastCol = locationsOfTurns.get(0)[0];
-			lastRow = locationsOfTurns.get(0)[1];
 			collection = new String[locationsOfTurns.size()][2];
-			
-			// finds all the words that are inside of the last move
-			for (int i=0; i<locationsOfTurns.size(); i+= 1) {
-				int col = locationsOfTurns.get(i)[0];
-				int row = locationsOfTurns.get(i)[1];
-				String[] foundWords = board.findWords(col, row);
-				
-				collection[i] = foundWords;
-				
-				// Checks if the last location is in line with the previous
-				if (lastCol != col && lastRow != row) {
-					System.out.println("\nERROR---------------------------------- \n\tThe plays must all be in the same row or column!\n ----------------------------------------");
-					reloop = true;
-				}
-			
-				//  Checks to see if the letter is all by itself
-				if (foundWords[0] == "" && foundWords[1] == "") {
-					System.out.println("\nERROR----------------------------------- \n\tYou have to play the letter next to another letter!\n ----------------------------------------");
-					reloop = true;
-				}
-			}
-			
-			if (reloop) { // If the user put the tiles in an invalid spot then the code will loop to the beginning of the turn and restart/undo the the turn
-				System.out.println("Your played letter will now return to your inventory \nand you will start placing them again!\n");
-				returnTilesToHandFromBoard(board, locationsOfTurns, blankIndexes);
-				reloop = false;
-				continue;
-			}
-			
-			finalWords = removeDuplicates(collection); // Get unrepeated words from the collection[] and initialize finalWords with that value
-			badWords = findBadWords(finalWords); // Search the finalWords ArrayList for words that don't actually exist
-			
-			
-			if (badWords.size() > 0) { // if there are any non real words then tell player the words that don't exist and return them while looping to the top
-				System.out.println("\nERROR----------------------------------- \n\tSome of your words " + badWords + " don't exist! \n ----------------------------------------");
-				returnTilesToHandFromBoard(board, locationsOfTurns, blankIndexes);
-				continue;
-			}
-			break; // If code reaches this point then the player's move was valid and the playing phase will end
-		}	
+			int scoreToReturn = this.checkValidWord(locationsOfTurns, collection, finalWords, badWords, blankIndexes, board, pile, view);
 		
-		// End of turn:
+		
+		for (int i=0; i<locationsOfTurns.size(); i++) { // Loop to replace the words that were played
+			hand.addLetter(pile.drawTop()); // Adds letter to the hand
+		}
+		
+		return scoreToReturn; // Returns the totalScore of the player's move
+	}
+	
+	
+	/**
+	 * Logic of the turn to check if the word that was played is valid (ie exitsts in dictionary) or played legally on board
+	 * @param locationsOfTurns ArrayList<int[]> of where the turnds were played
+	 * @param collection String[][] of the words that the player has played
+	 * @param finalWords ArrayList<String> to be filled by the valid words found --> no repeats
+	 * @param badWords	ArrayList<String> of the invalid plays of the words
+	 * @param blankIndexes ArrayList<Integer> Where the blank was played so it can be returned to the hand as blank
+	 * @param board Board object where the turn was played
+	 * @param pile Pile object to draw/return to the pile
+	 * @param view GameViewManager object that may be used for things like buttons/alerts
+	 * @return the score of the player
+	 */
+	private int checkValidWord(ArrayList<int[]> locationsOfTurns, String[][]collection, ArrayList<String> finalWords, ArrayList<String> badWords, ArrayList<Integer> blankIndexes, Board board, Pile pile, GameViewManager view) {
+		boolean reloop = false; // This just is to say if there has been a bad play
+		// --------
+		// This is the logic for finding words and making sure that the play was a valid one
+		int lastCol, lastRow;
+		lastCol = locationsOfTurns.get(0)[0];
+		lastRow = locationsOfTurns.get(0)[1];
+		
+		
+		// finds all the words that are inside of the last move
+		for (int i=0; i<locationsOfTurns.size(); i+= 1) {
+			int col = locationsOfTurns.get(i)[0];
+			int row = locationsOfTurns.get(i)[1];
+			String[] foundWords = board.findWords(col, row);
+			
+			collection[i] = foundWords;
+			
+			// Checks if the last location is in line with the previous
+			if (lastCol != col && lastRow != row) {
+				System.out.println("\nERROR---------------------------------- \n\tThe plays must all be in the same row or column!\n ----------------------------------------");
+				reloop = true;
+			}
+		
+			//  Checks to see if the letter is all by itself
+			if (foundWords[0] == "" && foundWords[1] == "") {
+				System.out.println("\nERROR----------------------------------- \n\tYou have to play the letter next to another letter!\n ----------------------------------------");
+				reloop = true;
+			}
+		}
+		
+		if (reloop) { // If the user put the tiles in an invalid spot then the code will loop to the beginning of the turn and restart/undo the the turn
+			System.out.println("Your played letter will now return to your inventory \nand you will start placing them again!\n");
+			returnTilesToHandFromBoard(board, locationsOfTurns, blankIndexes);
+			reloop = false;
+			return this.takeTurn(board, pile, view);
+		}
+		
+		finalWords = removeDuplicates(collection); // Get unrepeated words from the collection[] and initialize finalWords with that value
+		badWords = findBadWords(finalWords); // Search the finalWords ArrayList for words that don't actually exist
+		
+		
+		if (badWords.size() > 0) { // if there are any non real words then tell player the words that don't exist and return them while looping to the top
+			System.out.println("\nERROR----------------------------------- \n\tSome of your words " + badWords + " don't exist! \n ----------------------------------------");
+			returnTilesToHandFromBoard(board, locationsOfTurns, blankIndexes);
+			return this.takeTurn(board, pile, view);
+		}	
+		return displayEndOfTurnInfo(finalWords);
+	}
+	
+	/**
+	 * Prints out the scores that the player has played and it also updates the total score by the amount the player scored
+	 * 
+	 * @param finalWords the list of the words that the player played (these are the words that get scored)
+	 * @return the value of the player's total score
+	 */
+	private int displayEndOfTurnInfo(ArrayList<String> finalWords) {
 		//	Loops through the words they played and the corresponding values
 		System.out.println("These are the words you played: ");
-		int adder=0, totalScore=0; // Adder for values of letter within each word. totalScore of all the words within the ArrayList<String>
+		int adder = 0, totalScore = 0; // Adder for values of letter within each word. totalScore of all the words within the ArrayList<String>
 		for (int i=0; i<finalWords.size(); i++) {
 			adder = 0;
 			for (int k=0; k<finalWords.get(i).length(); k++) {
@@ -175,14 +232,11 @@ public class Player
 			System.out.print("\t" + finalWords.get(i) + " (" + adder +")");
 			totalScore += adder;
 		}
-		System.out.println("\tTotal From Turn: " + totalScore + " (" + score +")"); // Print out total score for that turn and the new total score
+		System.out.println("\tTotal From Turn: " + totalScore + " (" + score + totalScore  +")"); // Print out total score for that turn and the new total score
 		score += totalScore; // Update the player's total score
-		for (int i=0; i<locationsOfTurns.size(); i++) { // Loop to replace the words that were played
-			hand.addLetter(pile.drawTop()); // Adds letter to the hand
-		}
-		return totalScore; // Returns the totalScore of the player's move
+		return totalScore;
+		
 	}
-	
 	/**
 	 * Method finds any words that aren't real using method in Scrabble.java (which reads from txt file of valid words)
 	 * and will return those words in the form of an ArrayList<String>
@@ -364,38 +418,18 @@ public class Player
 		return name + " with a hand of " + hand;
 	}
 	
-	/**
-	 * returns the value of score
-	 * @return the int value of the score
-	 * @author 21wwalling-sotolongo
-	 */
 	public int getScore() {
 		return score;
 	}
 	
-	/**
-	 * Adds to the score by the parameter
-	 * @param score what is added to the score
-	 * @author 21wwalling-sotolongo
-	 */
 	public void addScore(int score) {
 		this.score += score;
 	}
 	
-	/**
-	 * Resets the score to the parameter
-	 * @param score the new value for score
-	 * @author 21wwalling-sotolongo
-	 */
 	public void setScore(int score) {
 		this.score = score;
 	}
 	
-	/**
-	 * Gets the name of the player and returns it
-	 * @return the name of the player object
-	 * @author 21wwalling-sotolongo
-	 */
 	public String getName() {
 		return name;
 	}
