@@ -31,6 +31,7 @@ public class GameViewManager {
 	private AnimationTimer gameTimer;
 	private AnimationTimer gameT;
 	private boolean paused;
+	private boolean isPlayerTakingTurn;
 	
 	public GameViewManager() {
 		initializeStage();
@@ -66,23 +67,30 @@ public class GameViewManager {
 		game.endGame();
 		paused = true;
 	}
+	
+	private void haveNextPlayerTakeTurn() {
+		isPlayerTakingTurn = true;
+		System.out.println("ROUND----------------------------------- \nStarting new playing phase \n-----------------------------------");
+		boolean playerTurn = game.playingPhase();
+		if (!playerTurn) {
+			System.out.println("ENDING----------------------------------- \n 	Game has ended \n ----------------------------------- ");
+			endGame();
+		}
+		isPlayerTakingTurn = false;
+	}
+	
 	private void createGameLoop() {
-		loaded = false; // This exists to give the game elements time to load in the beginning before the player turn happens
+		loaded = false; // This exists to give the game elements time to load in the beginning before the player turn happens so that there is no grey screen
 		System.out.println("Loading...");
 		counter = 0;
+		isPlayerTakingTurn = false;
 		gameTimer = new AnimationTimer() {
 			
 			@Override
 			public void handle(long now) {
-				if (!paused && loaded ) {
-					gameTimer.stop();
-					System.out.println("ROUND----------------------------------- \nStarting new playing phase \n-----------------------------------");
-					if (!game.playingPhase()) { // If the playing phase detects that the game has ended it will return false
-						System.out.println("ENDING----------------------------------- \n 	Game has ended \n ----------------------------------- ");
-						endGame();
-					}
+				if (!paused && loaded && !isPlayerTakingTurn) {
 					
-					
+					haveNextPlayerTakeTurn();
 				} else if (counter < MAX_COUNTER){
 					counter ++;
 					if (MAX_COUNTER%20 == counter%20) { System.out.println("	" + (int)(counter/(double) MAX_COUNTER * 100) + "%"); }
@@ -93,14 +101,6 @@ public class GameViewManager {
 		};
 		gameTimer.start();
 		
-		gameT = new AnimationTimer() {
-			
-			@Override
-			public void handle(long now) {
-				gameTimer.start();
-			}
-		};
-		gameT.start();
 	}
 	
 	
