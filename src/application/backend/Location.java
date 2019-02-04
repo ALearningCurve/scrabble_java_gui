@@ -9,7 +9,8 @@ import javafx.scene.effect.DropShadow;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Font;
-
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 /**
  * This is a class the represents a location within the board
  * @author 21wwalling-sotolongo
@@ -29,6 +30,8 @@ public class Location extends Button{
 	public final static int HEIGHT = 45;
 	public final static int WIDTH = 49;
 	
+	
+	private Text tileValue;
 	/**
 	 * Location constructor. 
 	 * @author 21wwalling-sotolongo
@@ -36,10 +39,13 @@ public class Location extends Button{
 	public Location() {
 		setText(this.toString());
 		setButtonFont();
+		createValueOfTileVBox();
 		setPrefWidth(WIDTH);
 		setPrefHeight(HEIGHT);
 		setStyle(BUTTON_FREE_STYLE);
 		initializeButtonListeners();
+		// System.out.println(this.getChildren());
+		
 	}
 	
 	public void updateTextOnButton() {
@@ -110,6 +116,19 @@ public class Location extends Button{
 	
 	// // /// // // // // // // //
 	
+	private void createValueOfTileVBox() {
+		/*
+		valueLabel = new HBox();
+		this.getChildren().add(valueLabel);
+		valueLabel.setLayoutX(0);
+		valueLabel.setLayoutY(0);
+		*/
+		tileValue = new Text(".");
+		tileValue.setFont(Font.font("Arial", FontWeight.BOLD, 14));
+		this.getChildren().add(tileValue);
+		
+
+	}
 	
 	private void setButtonFont() {
 		try {
@@ -121,14 +140,14 @@ public class Location extends Button{
 	
 	private void setButtonPressedStyle() {
 		setStyle(BUTTON_PRESSED_STYLE);
-		setPrefHeight(45);
-		setLayoutY(getLayoutY() + 4);
+		// setPrefHeight(HEIGHT);
+		setLayoutY(getLayoutY() + 2);
 	}
 	
 	private void setButtonReleasedStyle() {
 		setStyle(BUTTON_FREE_STYLE);
-		setPrefHeight(49);
-		setLayoutY(getLayoutY() - 4);
+		// setPrefHeight(HEIGHT);
+		setLayoutY(getLayoutY() - 2);
 	}
 	
 	

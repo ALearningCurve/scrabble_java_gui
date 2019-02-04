@@ -29,7 +29,6 @@ public class GameViewManager {
 	private Stage menuStage;
 	private int numberOfPlayers;
 	private AnimationTimer gameTimer;
-	private AnimationTimer gameT;
 	private boolean paused;
 	private boolean isPlayerTakingTurn;
 	

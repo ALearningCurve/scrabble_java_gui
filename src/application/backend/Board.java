@@ -29,8 +29,8 @@ public class Board {
 	    for (int col=0; col<NUM_COLS; col++){
 	        for (int row=0; row<NUM_ROWS; row++){
 	            grid[col][row] = new Location();
-	            grid[col][row].setLayoutY(Location.WIDTH/2 + col * Location.WIDTH);
-	            grid[col][row].setLayoutX(Location.HEIGHT/2 + row * Location.HEIGHT);
+	            grid[col][row].setLayoutY(Location.WIDTH/2 + col * Location.HEIGHT);
+	            grid[col][row].setLayoutX(Location.HEIGHT/2 + row * Location.WIDTH);
 	            gamePane.getChildren().add(grid[col][row]);
 	            // System.out.println(gamePane.getChildren());
 	        }
