@@ -161,6 +161,10 @@ public class Scrabble {
 		locationInPlayerList = 0;
 	}
 	
+	public Player getPlayerWhooseTurnItIs() {
+		Player player = players[locationInPlayerList];
+		return player;
+	}
 	
 	/**
 	 * Represents what happens during the playing phase of the game
@@ -170,19 +174,22 @@ public class Scrabble {
 	 * @author 21wwalling-sotolongo
 	 */
 	public boolean playingPhase() {
+		System.out.println("called");
 		if (6 != consecutiveScoreless) { // Loops until the players forfeits 6x or player hand & pile are empty
-			Player player = players[locationInPlayerList];
+			Player player = getPlayerWhooseTurnItIs();
 			System.out.println("Its " + player.getName() + "\'s (" + player.getScore() +" pts.) turn! \n\n" );
-			if (player.takeTurn(board, pile, view) == 0) {
-				consecutiveScoreless ++;
-				System.out.println("ALERT-----\n " + (6 - consecutiveScoreless) + " forfeits left\n---------");
-			} else {
-				consecutiveScoreless = 0;
-			}
-			if (!player.getHand().checkIfEmpty() && pile.getSize() == 0) { // If the pile is empty and one of the hands is empty then the game is ended
-				System.out.println("ALERT-----\n " + player.getName() + " has emptied their hand\n---------");
-				return false;
-			}
+			int playerScore = player.takeTurn(board, pile, view);
+			
+				if (playerScore == 0) {
+					consecutiveScoreless ++;
+					System.out.println("ALERT-----\n " + (6 - consecutiveScoreless) + " forfeits left\n---------");
+				} else {
+					consecutiveScoreless = 0;
+				}
+				if (!player.getHand().checkIfEmpty() && pile.getSize() == 0) { // If the pile is empty and one of the hands is empty then the game is ended
+					System.out.println("ALERT-----\n " + player.getName() + " has emptied their hand\n---------");
+					return false;
+				}
 			
 		} else {
 			return false;

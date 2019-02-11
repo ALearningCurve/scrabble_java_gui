@@ -1,6 +1,8 @@
 package application;
-import application.backend.Scrabble;
+
 import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import view.ViewManager;
 
@@ -22,3 +24,4 @@ public class Main extends Application {
 		launch(args);
 	}
 }
+

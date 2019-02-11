@@ -20,6 +20,8 @@ public class Player
 	@SuppressWarnings("unused")
 	private AnchorPane gamePane;
 	
+	public int locationInTurn = 0;
+	
 	/**
 	 * Constructor for the Player class that creates player with the name given
 	 * @param name the name for the player object
@@ -101,11 +103,25 @@ public class Player
 				break;
 			}
 			System.out.println("This is now your hand:\n"  + hand );
+			locationInTurn = 1;
 			
 		}
 		return 1;
 	}
 
+	private ArrayList<int[]> locationsOfTurns; // Keeps tracj of the indexes and the locations of all the moves
+	private String[][] collection; // Collection of all the words that are on the grid
+	private ArrayList<String> finalWords = new ArrayList<String>(), badWords = new ArrayList<String>(); // This is a list of the individual words and badWords are the words that are invalid
+	private ArrayList<Integer> blankIndexes; // Keeps track of indexes of blanks so that later it can be used to return invalid moves with blanks
+	
+	private void resetVariablesForTurn() {
+		locationsOfTurns = new ArrayList<int[]>(); // Keeps tracj of the indexes and the locations of all the moves
+		collection = null;; // Collection of all the words that are on the grid
+		finalWords = new ArrayList<String>(); 
+		badWords = new ArrayList<String>(); // This is a list of the individual words and badWords are the words that are invalid
+		blankIndexes = new ArrayList<Integer>(); // Keeps track of indexes of blanks so that later it can be used to return invalid moves with blanks
+		
+	}
 	/**
 	 * Take the input from the player to get the letter from their hand, remove it, and put it to 
 	 * the location on the board that is designated by user input. This repeats until the hand is either empty 
@@ -122,34 +138,41 @@ public class Player
 	 * @author 21wwalling-sotolongo
 	 */
 	
+	// 0 is the beginning where the variables are reset and the turn is taken
 	public int takeTurn(Board board, Pile pile, GameViewManager view) {
-		ArrayList<int[]> locationsOfTurns; // Keeps tracj of the indexes and the locations of all the moves
-		String[][] collection; // Collection of all the words that are on the grid
-		ArrayList<String> finalWords = new ArrayList<String>(), badWords = new ArrayList<String>(); // This is a list of the individual words and badWords are the words that are invalid
-		ArrayList<Integer> blankIndexes; // Keeps track of indexes of blanks so that later it can be used to return invalid moves with blanks
-		
-			
-			locationsOfTurns = new ArrayList<int[]>(); // Initiallizes and Resets the list
-			blankIndexes = new ArrayList<Integer>();  // Initiallizes and Resets the list
-			System.out.println("This is your hand:\n"  + hand );
-			
-			if (playTiles(board, locationsOfTurns, blankIndexes) == 0) {
-				return 0;
-			}
-			
-			System.out.println("\nEnd of turn board:");
-			board.printStatus();
-			board.printStatus(true);
-			
-			collection = new String[locationsOfTurns.size()][2];
-			int scoreToReturn = this.checkValidWord(locationsOfTurns, collection, finalWords, badWords, blankIndexes, board, pile, view);
-		
-		
-		for (int i=0; i<locationsOfTurns.size(); i++) { // Loop to replace the words that were played
-			hand.addLetter(pile.drawTop()); // Adds letter to the hand
+		if (locationInTurn == 0) {
+			resetVariablesForTurn();
+			locationInTurn = 1;
 		}
 		
-		return scoreToReturn; // Returns the totalScore of the player's move
+		if (locationInTurn == 1) {
+				System.out.println("This is your hand:\n"  + hand );
+					if (playTiles(board, locationsOfTurns, blankIndexes) == 0) {
+						return 0;
+					}
+					
+				System.out.println("\nEnd of turn board:");
+				board.printStatus();
+				board.printStatus(true);
+				
+				locationInTurn = 2;
+		}
+		
+		if (locationInTurn == 2) {
+				collection = new String[locationsOfTurns.size()][2];
+				int scoreToReturn = this.checkValidWord(locationsOfTurns, collection, finalWords, badWords, blankIndexes, board, pile, view);
+				if (scoreToReturn == -2) {
+					 // TODO something so that the game doesn't continue but doesn' move onto next player
+				}
+			
+			for (int i=0; i<locationsOfTurns.size(); i++) { // Loop to replace the words that were played
+				hand.addLetter(pile.drawTop()); // Adds letter to the hand
+			}
+			
+			locationInTurn = 0;
+			return scoreToReturn; // Returns the totalScore of the player's move
+		}
+		return locationInTurn;
 	}
 	
 	
@@ -199,7 +222,8 @@ public class Player
 			System.out.println("Your played letter will now return to your inventory \nand you will start placing them again!\n");
 			returnTilesToHandFromBoard(board, locationsOfTurns, blankIndexes);
 			reloop = false;
-			return this.takeTurn(board, pile, view);
+			locationInTurn = 1;
+			// return this.takeTurn(board, pile, view);
 		}
 		
 		finalWords = removeDuplicates(collection); // Get unrepeated words from the collection[] and initialize finalWords with that value
@@ -209,9 +233,14 @@ public class Player
 		if (badWords.size() > 0) { // if there are any non real words then tell player the words that don't exist and return them while looping to the top
 			System.out.println("\nERROR----------------------------------- \n\tSome of your words " + badWords + " don't exist! \n ----------------------------------------");
 			returnTilesToHandFromBoard(board, locationsOfTurns, blankIndexes);
-			return this.takeTurn(board, pile, view);
+			locationInTurn = 1;
+			// return this.takeTurn(board, pile, view);
 		}	
-		return displayEndOfTurnInfo(finalWords);
+		if (locationInTurn != 1) {
+			return displayEndOfTurnInfo(finalWords);
+		} else {
+			return -2;
+		}
 	}
 	
 	/**
@@ -232,7 +261,7 @@ public class Player
 			System.out.print("\t" + finalWords.get(i) + " (" + adder +")");
 			totalScore += adder;
 		}
-		System.out.println("\tTotal From Turn: " + totalScore + " (" + score + totalScore  +")"); // Print out total score for that turn and the new total score
+		System.out.println("\tTotal From Turn: " + totalScore + " (" + ((int) score + (int)totalScore)  +")"); // Print out total score for that turn and the new total score
 		score += totalScore; // Update the player's total score
 		return totalScore;
 		
