@@ -1,4 +1,8 @@
 package application.backend;
+
+
+import javafx.scene.layout.AnchorPane;
+
 /**
  * This is a hand to represent the hand/rack which each player has and will hold/do things with the 
  * letters
@@ -17,6 +21,9 @@ public class Hand {
 		hand = new Letter[MAX_CARDS_IN_HAND];
 	}
 	
+	public Letter[] getLetterList() {
+		return hand;
+	}
 	/**
 	 * Adds the parameter to the hand, Its the same a drawing
 	 * returns whether or not the letter has been added successfully

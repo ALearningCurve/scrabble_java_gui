@@ -30,6 +30,8 @@ public class Location extends Button{
 	public final static int HEIGHT = 45;
 	public final static int WIDTH = 49;
 	
+	private boolean isClicked;
+	
 	
 	private Text tileValue;
 	/**
@@ -37,6 +39,7 @@ public class Location extends Button{
 	 * @author 21wwalling-sotolongo
 	 */
 	public Location() {
+		setClicked(false);
 		setText(this.toString());
 		setButtonFont();
 		createValueOfTileVBox();
@@ -96,6 +99,7 @@ public class Location extends Button{
 	public void setLetter(Letter l) {
 		status = FULL;
 		this.letter = l;
+		updateTextOnButton();
 	}
 	
 	/**
@@ -132,7 +136,7 @@ public class Location extends Button{
 	
 	private void setButtonFont() {
 		try {
-			setFont(Font.loadFont(new FileInputStream(FONT_PATH), 23));
+			setFont(Font.loadFont(new FileInputStream(FONT_PATH), 18));
 		} catch (FileNotFoundException e) {
 			setFont(Font.font("Verdana", 12));
 		}
@@ -142,6 +146,7 @@ public class Location extends Button{
 		setStyle(BUTTON_PRESSED_STYLE);
 		// setPrefHeight(HEIGHT);
 		setLayoutY(getLayoutY() + 2);
+		
 	}
 	
 	private void setButtonReleasedStyle() {
@@ -160,6 +165,7 @@ public class Location extends Button{
 			public void handle(MouseEvent event) {
 				if (event.getButton().equals(MouseButton.PRIMARY)) {
 					setButtonPressedStyle();
+					setClicked(true);
 				}
 			}
 		});
@@ -169,6 +175,7 @@ public class Location extends Button{
 			public void handle(MouseEvent event) {
 				if (event.getButton().equals(MouseButton.PRIMARY)) {
 					setButtonReleasedStyle();
+					setClicked(false);
 				}
 			}
 		});
@@ -190,5 +197,13 @@ public class Location extends Button{
 				setStyle(BUTTON_FREE_STYLE);
 			}
 		});
+	}
+
+	public boolean isClicked() {
+		return isClicked;
+	}
+
+	public void setClicked(boolean isClicked) {
+		this.isClicked = isClicked;
 	}	
 }

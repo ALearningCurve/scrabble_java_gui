@@ -68,14 +68,20 @@ public class GameViewManager {
 	}
 	
 	private void haveNextPlayerTakeTurn() {
-		isPlayerTakingTurn = true;
-		System.out.println("ROUND----------------------------------- \nStarting new playing phase \n-----------------------------------");
-		boolean playerTurn = game.playingPhase();
-		if (!playerTurn) {
-			System.out.println("ENDING----------------------------------- \n 	Game has ended \n ----------------------------------- ");
-			endGame();
+		game.getPlayerWhooseTurnItIs().takeTurn(game.getBoard(), game.getPile(), game.getView());
+		if (isPlayerTakingTurn == false) {
+			isPlayerTakingTurn = true;
+			
+			
+			
+			/*
+			System.out.println("ROUND----------------------------------- \nStarting new playing phase \n-----------------------------------");
+			boolean playerTurn = game.playingPhase();
+			if (!playerTurn) {
+				System.out.println("ENDING----------------------------------- \n 	Game has ended \n ----------------------------------- ");
+				endGame();
+			}*/
 		}
-		isPlayerTakingTurn = false;
 	}
 	
 	private void createGameLoop() {
@@ -87,8 +93,7 @@ public class GameViewManager {
 			
 			@Override
 			public void handle(long now) {
-				if (!paused && loaded && !isPlayerTakingTurn) {
-					
+				if (!paused && loaded) {
 					haveNextPlayerTakeTurn();
 				} else if (counter < MAX_COUNTER){
 					counter ++;

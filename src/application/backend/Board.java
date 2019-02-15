@@ -283,6 +283,21 @@ public class Board {
 		
 		return wordList;
 	}
+	
+	public Integer[] checkIfAnyLocationClicked() { 
+		Integer[] coordinate = {-1,-1};
+		for (int row=0; row<NUM_ROWS; row++){
+	        for (int col=0; col<NUM_COLS; col++){
+	            Location loc = grid[row][col];
+	            if (loc.isClicked()) {
+	            	coordinate[0] = row;
+	            	coordinate[1] = col;
+	            	return coordinate;
+	            }
+	        }
+	    } 
+		return coordinate;
+	}
 	public String toString() {
 		printStatus();
 		return "";

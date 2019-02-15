@@ -247,4 +247,8 @@ public class Scrabble {
 	public GameViewManager getView() {
 		return view;
 	}
+	
+	public Pile getPile() {
+		return pile;
+	}
 }

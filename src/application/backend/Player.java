@@ -4,7 +4,14 @@
  *
  */
 package application.backend;
+import javafx.animation.AnimationTimer;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.text.Text;
+import model.ScrabbleButton;
 import view.GameViewManager;
 
 import java.util.*;
@@ -17,21 +24,37 @@ public class Player
 	private int score = 0; // Players score
 	private Scanner sc = new Scanner(System.in); // Scanner used to get user input
 
-	@SuppressWarnings("unused")
+
+	private Text infoText;
+	private AnimationTimer gameTimer;
+	
+	private ScrabbleButton endTurnButton;
 	private AnchorPane gamePane;
 	
 	public int locationInTurn = 0;
+	private int number = -100;
+	private int index, row, col;
+	boolean endTurn = false;
 	
 	/**
 	 * Constructor for the Player class that creates player with the name given
 	 * @param name the name for the player object
 	 * @author 21wwalling-sotolongo
 	 */
-	public Player(String name, AnchorPane gamePane) {
+	public Player(String name, AnchorPane gamePane,Board board) {
 		numPlayers ++;
 		this.name = name;
 		this.hand = new Hand();
 		this.gamePane = gamePane;
+		
+		
+		createKeyListeners();
+		createGameLoops(board);
+		
+		infoText = new Text();
+		infoText.setLayoutX(800);
+		infoText.setLayoutY(100);
+		gamePane.getChildren().add(infoText);
 	}
 	
 	/**
@@ -44,7 +67,36 @@ public class Player
 		this.name = "Player " + numPlayers; 
 		this.hand = new Hand();
 		this.gamePane = gamePane;
+		
+		createKeyListeners();
+		
+		infoText = new Text();
+		infoText.setLayoutX(800);
+		infoText.setLayoutY(100);
+		gamePane.getChildren().add(infoText);
 	}
+	
+	private void createEndButton() {
+		try {
+			endTurn = false;
+			endTurnButton = new ScrabbleButton("End Turn");
+			endTurnButton.setLayoutX(800);
+			endTurnButton.setLayoutY(700);
+			
+			
+			endTurnButton.setOnAction(new EventHandler<ActionEvent>() {
+	
+				@Override
+				public void handle(ActionEvent event) {
+					endTurn = !endTurn;
+				}
+			});
+			gamePane.getChildren().add(endTurnButton);
+		} catch (Exception e) { 
+			// Add some handling for if there is already in the gamePane
+		}
+	}
+	
 	
 	/**
 	 * fills a hand to its limit with 7 cards from pile
@@ -55,7 +107,62 @@ public class Player
 		pile.dealStart(hand);
 	}
 	
+	private void createGameLoops(Board board) {
+		gameTimer = new AnimationTimer() {
+			@Override
+			public void handle(long now) {
+				for (int i=0; i<hand.getLetterList().length; i++) {
 	
+				}
+				
+				Integer[] coordinates = board.checkIfAnyLocationClicked();
+				if (coordinates[0] != -1 && coordinates[1] != -1) {
+					row = coordinates[0];
+					col = coordinates[1];
+				}
+			}
+		};
+		gameTimer.start();
+	}
+	
+	private void createKeyListeners() {
+		gamePane.getScene().setOnKeyPressed(new EventHandler<KeyEvent>() {
+
+			@Override
+			public void handle(KeyEvent event) {
+				if(event.getCode() == KeyCode.DIGIT0) {
+					number = 0;		
+				} else if(event.getCode() == KeyCode.DIGIT1) {
+					number = 1;
+				} else if(event.getCode() == KeyCode.DIGIT2) {
+					number = 2;
+				} else if(event.getCode() == KeyCode.DIGIT3) {
+					number = 3;
+				} else if(event.getCode() == KeyCode.DIGIT4) {
+					number = 4;
+				} else if(event.getCode() == KeyCode.DIGIT5) {
+					number = 5;
+				} else if(event.getCode() == KeyCode.DIGIT6) {
+					number = 6;
+				} else if(event.getCode() == KeyCode.DIGIT7) {
+					number = 7;
+				} else if(event.getCode() == KeyCode.DIGIT8) {
+					number = 8;
+				} else if(event.getCode() == KeyCode.DIGIT9) {
+					number = 9;
+				}
+			}
+		});
+		
+		
+		gamePane.getScene().setOnKeyReleased(new EventHandler<KeyEvent>() {
+			@Override
+			public void handle(KeyEvent event) {
+				number = -100;
+			}
+		});
+		
+	}
 	
 	/**
 	 * Part of the turn where the player enters locations for their tiles to be played and entered
@@ -64,47 +171,84 @@ public class Player
 	 * @param blankIndexes ArrayList<Integer> Index in hand where the blank came from
 	 * @return
 	 */
+	
 	private int playTiles (Board board, ArrayList<int[]> locationsOfTurns, ArrayList<Integer> blankIndexes) {
-		while(hand.checkIfEmpty()){ // Lets the player put down the letters onto the board
-			board.printStatus();
-			board.printStatus(true);
-			int index = readInt(-1,6, "Enter the index of the card to be played (-1 to forfeit turn)"); // Ask for the card in the hand to be placed
+		if (hand.checkIfEmpty()){ // Lets the player put down the letters onto the board
 			
-			if (index == -1) {
+			this.updateInfoText();
+			
+			if (number != -100 && index == -100) {
+				index = number;	
+			} 
+			if (index != -100 && number != -100) {
+				number = -100;
+			} 
+			if (index == -100) {
+				return -1;
+			}
+			
+			if (index == 9) {
 				System.out.println("\nFORFEIT----------------------------------- \n\tYour turn has been forfieted, returning cards to hand! \n ----------------------------------------");
+				locationInTurn = 0;
+				removePlayerAssets();
 				returnTilesToHandFromBoard(board, locationsOfTurns, blankIndexes);
 				return 0;
 			}
 			if (hand.getLetterIndex(index) == null) {
+				locationInTurn = 0;
 				System.out.println("\nERROR---------------------------------- \n\tThat tile has already been played\n ----------------------------------------");
-				continue;
+				index = -100;
+				number = -100;
+				return -1;
+				
 			} else if (hand.getLetterIndex(index).getCharacter() == ' ') { // Checks if the letter at that index is a blank, and if so then it sets it to something else
 				System.out.println("You are playing a blank!");
 				hand.getLetterIndex(index).setBlankValue(sc);
 				blankIndexes.add(index);
 			}
 			
-			int col = readInt(0,14, "Enter the column for the letter to go") ;  // Ask for the x coordinate
-			int row = readInt(0,14, "Enter the row for the letter to go") ; // Ask for the y coordinate
+			this.updateInfoText();
 			
+			// col = readInt(0,14, "Enter the column for the letter to go") ;  // Ask for the x coordinate
+			// row = readInt(0,14, "Enter the row for the letter to go") ; // Ask for the y coordinate
+			
+			if (row == -100 && col == -100) {
+				return -100;
+			}
+		
 			if (board.get(col, row).getStatus() == Location.EMPTY) {// Removes the letter and plays it if there is no letter on that spot
 				Letter letter = hand.remove(index);
+				gamePane.getChildren().remove(letter);
 				board.setLetter(col, row, letter);
+				
 			} else { // If there is a letter on that spot then it tells player and continues
 				System.out.println("\nERROR---------------------------------- \n\tYou cannot play over the same tile!\n ----------------------------------------");
-				continue;
+				col = -100;
+				row = -100;
+				return -1;
 			}
 			
 			// Updates the hashmap with values of where the tiles have been placed
 			locationsOfTurns.add(new int[]{col, row, index});
 			
-			// Checks if the user's turn is over or not
-			if (readInt("Done with your turn? (0 is yes)") == 0) {
-				break;
-			}
-			System.out.println("This is now your hand:\n"  + hand );
-			locationInTurn = 1;
 			
+			index = -100;
+			row = -100;
+			col = -100;
+			number = -100;
+			board.printStatus(true);
+			board.printStatus();
+			
+			// Checks if the user's turn is over or not
+			if (endTurn) {
+				endTurn = false;
+				locationInTurn = 2;
+				return 9;
+			} else {
+				System.out.println("This is now your hand:\n"  + hand );
+				locationInTurn = 1;
+				return -1;
+			}
 		}
 		return 1;
 	}
@@ -120,7 +264,59 @@ public class Player
 		finalWords = new ArrayList<String>(); 
 		badWords = new ArrayList<String>(); // This is a list of the individual words and badWords are the words that are invalid
 		blankIndexes = new ArrayList<Integer>(); // Keeps track of indexes of blanks so that later it can be used to return invalid moves with blanks
+		index = -100;
+		col = -100;
+		row = -100;
+		number = -100;
+		endTurn = false;
+	
+	}
+	
+	public void updateInfoText() {
+		String indexS = "#", rowS = "#", colS= "#";
+		if (index > -100) { 
+			indexS = "" + index;
+		} 
+		if (row > -100) {
+			rowS = "" + row;
+		}
+		if (col > -100) {
+			colS = "" + col;
+		}
+		infoText.setText(
+				"Score: " + score +
+				"\nIndex: " + indexS +
+				"\nColmn: " + colS +
+				"\nRow: " + rowS +
+				"\nEnd Turn: " + endTurn
+				);
 		
+	}
+	
+	private void addLettersToScreen() {
+		Letter[] letterList = hand.getLetterList();
+		for (int i=0; i<letterList.length; i++) {
+			try {
+				gamePane.getChildren().add(letterList[i]);
+				letterList[i].setLayoutX(200 + i*(Letter.WIDTH + 10));
+				letterList[i].setLayoutY(720);
+			} catch (Exception e) {
+				System.out.println("--------------- \n duplication \n---------------");
+			}
+		}
+	}
+	
+	private void removeLettersFromScreen() { 
+		Letter[] letterList = hand.getLetterList();
+		for (int i=0; i<letterList.length; i++) {
+			gamePane.getChildren().remove(letterList[i]);
+			
+		}
+	}
+	
+	private void removePlayerAssets() {
+		removeLettersFromScreen();
+		// gamePane.getChildren().removeAll(gamePane.getChildren());
 	}
 	/**
 	 * Take the input from the player to get the letter from their hand, remove it, and put it to 
@@ -140,29 +336,57 @@ public class Player
 	
 	// 0 is the beginning where the variables are reset and the turn is taken
 	public int takeTurn(Board board, Pile pile, GameViewManager view) {
+		
 		if (locationInTurn == 0) {
+			createEndButton();
+			addLettersToScreen();
 			resetVariablesForTurn();
 			locationInTurn = 1;
+			
+			System.out.println("This is your hand:\n"  + hand );
+			board.printStatus();
+			board.printStatus(true);
+			
+			this.createGameLoops(board);
 		}
 		
 		if (locationInTurn == 1) {
-				System.out.println("This is your hand:\n"  + hand );
-					if (playTiles(board, locationsOfTurns, blankIndexes) == 0) {
-						return 0;
-					}
+			
+				int turnValue = playTiles(board, locationsOfTurns, blankIndexes);
+				
+				if (turnValue == 0) {
+					locationInTurn = 0;
+					return 0;
+				} else if (turnValue == -1){
+					return -100;
+				} else if (turnValue == 9) {
+					// This is if the player decides to quit
+				}
 					
 				System.out.println("\nEnd of turn board:");
 				board.printStatus();
 				board.printStatus(true);
 				
 				locationInTurn = 2;
+				number = -100;
+				index = -100;
+				col = -100;
+				row = -100;
 		}
-		
+
 		if (locationInTurn == 2) {
+				
+				removePlayerAssets();
 				collection = new String[locationsOfTurns.size()][2];
-				int scoreToReturn = this.checkValidWord(locationsOfTurns, collection, finalWords, badWords, blankIndexes, board, pile, view);
-				if (scoreToReturn == -2) {
-					 // TODO something so that the game doesn't continue but doesn' move onto next player
+				int scoreToReturn = -100;
+				try {
+					scoreToReturn = this.checkValidWord(locationsOfTurns, collection, finalWords, badWords, blankIndexes, board, pile, view);
+				} catch (IndexOutOfBoundsException e) {
+					scoreToReturn = 0;
+				}
+				if (scoreToReturn == -100) {
+					 locationInTurn = 0;
+					 return -100;
 				}
 			
 			for (int i=0; i<locationsOfTurns.size(); i++) { // Loop to replace the words that were played
@@ -170,9 +394,10 @@ public class Player
 			}
 			
 			locationInTurn = 0;
+			System.out.println("Score: " + scoreToReturn);
 			return scoreToReturn; // Returns the totalScore of the player's move
 		}
-		return locationInTurn;
+		return -1;
 	}
 	
 	
@@ -222,8 +447,8 @@ public class Player
 			System.out.println("Your played letter will now return to your inventory \nand you will start placing them again!\n");
 			returnTilesToHandFromBoard(board, locationsOfTurns, blankIndexes);
 			reloop = false;
-			locationInTurn = 1;
-			// return this.takeTurn(board, pile, view);
+			locationInTurn = 0;
+			return -100;
 		}
 		
 		finalWords = removeDuplicates(collection); // Get unrepeated words from the collection[] and initialize finalWords with that value
@@ -233,14 +458,13 @@ public class Player
 		if (badWords.size() > 0) { // if there are any non real words then tell player the words that don't exist and return them while looping to the top
 			System.out.println("\nERROR----------------------------------- \n\tSome of your words " + badWords + " don't exist! \n ----------------------------------------");
 			returnTilesToHandFromBoard(board, locationsOfTurns, blankIndexes);
-			locationInTurn = 1;
-			// return this.takeTurn(board, pile, view);
+			locationInTurn = 0;
+			return -100;
 		}	
-		if (locationInTurn != 1) {
-			return displayEndOfTurnInfo(finalWords);
-		} else {
-			return -2;
-		}
+		
+		
+		return displayEndOfTurnInfo(finalWords);
+		
 	}
 	
 	/**
@@ -348,6 +572,11 @@ public class Player
 			Letter letter = board.get(col, row).removeLetter();
 			if (hand.addLetter(letter, index) == false) {
 				hand.addLetter(letter);
+			} else {
+				gamePane.getChildren().add(hand.getLetterIndex(index));
+				
+				hand.getLetterIndex(index).setLayoutX(200 + index*(Letter.WIDTH + 10));
+				hand.getLetterIndex(index).setLayoutY(720);
 			}
 		}
 		for (int i=0; i<blankIndexes.size(); i++) {
@@ -433,7 +662,15 @@ public class Player
 	 */
 	public Letter draw(Pile pile) {
 		Letter letter = pile.drawTop();
+		
+		for (int i=0; i < hand.getLetterList().length; i++) {
+			if (hand.getLetterList()[i] == null) {
+				letter.setLayoutX(200 + i *(Letter.WIDTH + 10));
+				letter.setLayoutY(720);
+			}
+		}
 		hand.addLetter(letter);
+		gamePane.getChildren().add(letter);	
 		return letter;
 	}
 	

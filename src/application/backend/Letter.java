@@ -4,13 +4,29 @@
  *
  */
 package application.backend;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.*;
 
-public class Letter {
+import javafx.event.EventHandler;
+import javafx.scene.control.Button;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.text.Font;
+
+public class Letter extends Button{
 	 public static final HashMap<Integer, String> SCRABBLE_SCORES = (HashMap<Integer, String>) createMap();  
 	 private int value;  
 	 private char character = ' ';
 
+	 private final String FONT_PATH = "src/model/resources/kenvector_future.ttf";
+	private final String BUTTON_PRESSED_STYLE = "-fx-background-color: transparent; -fx-background-image: url('view/resources/scrabbletiles/scrabble_board_peice_selected.png');";
+	private final String BUTTON_FREE_STYLE = "-fx-background-color: transparent; -fx-background-image: url('view/resources/scrabbletiles/scrabble_board_peice.png');";
+	
+	public final static int HEIGHT = 45;
+	public final static int WIDTH = 49;
+	
 	 /**
 	  * This is the constructor for the class, sets character and finds value for that character
 	  * @author 21wwalling-sotolongo
@@ -19,7 +35,18 @@ public class Letter {
 	 public Letter(char character){
 		 this.character = character;
 		 this.value = getValue(this.character);
-	 }
+		 
+		 setText(this.toString());
+		 setButtonFont();
+		 setPrefWidth(WIDTH);
+		 setPrefHeight(HEIGHT);
+		 setStyle(BUTTON_FREE_STYLE);
+		 initializeButtonListeners();
+	 } 
+	 
+	 public void updateTextOnButton() {
+			setText(this.toString());
+	}
 	 
 	 /**
 	  * sets a Letter instance's value and character to that of a blank 
@@ -165,6 +192,71 @@ public class Letter {
 	public char getCharacter() {
 		return character;
 	}	 
+	
+	////////////////////////////
+	private void setButtonFont() {
+		try {
+			setFont(Font.loadFont(new FileInputStream(FONT_PATH), 15));
+		} catch (FileNotFoundException e) {
+			setFont(Font.font("Verdana", 10));
+		}
+	}
+	
+	@SuppressWarnings("unused")
+	private void setButtonPressedStyle() {
+		setStyle(BUTTON_PRESSED_STYLE);
+		// setPrefHeight(HEIGHT);
+		setLayoutY(getLayoutY() + 2);
+	}
+	
+	@SuppressWarnings("unused")
+	private void setButtonReleasedStyle() {
+		setStyle(BUTTON_FREE_STYLE);
+		// setPrefHeight(HEIGHT);
+		setLayoutY(getLayoutY() - 2);
+	}
+	
+	
+	
+	private void initializeButtonListeners() {
+		
+		
+		setOnMousePressed(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				if (event.getButton().equals(MouseButton.PRIMARY)) {
+					//setButtonPressedStyle();
+				}
+			}
+		});
+		
+		setOnMouseReleased(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				if (event.getButton().equals(MouseButton.PRIMARY)) {
+					//setButtonReleasedStyle();
+				}
+			}
+		});
+		
+		setOnMouseEntered(new EventHandler<MouseEvent>() {
+
+			@Override
+			public void handle(MouseEvent event) {
+				setEffect(new DropShadow());
+				setStyle(BUTTON_PRESSED_STYLE);
+			}
+		});
+		
+		setOnMouseExited(new EventHandler<MouseEvent>() {
+
+			@Override
+			public void handle(MouseEvent event) {
+				setEffect(null);
+				setStyle(BUTTON_FREE_STYLE);
+			}
+		});
+	}	
 }
 
 
