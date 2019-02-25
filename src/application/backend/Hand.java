@@ -72,9 +72,9 @@ public class Hand {
 	 * @return whether or not the letter was added
 	 * @author 21wwalling-sotolongo
 	 */
-	public boolean addLetter(Letter letter, int index) {
+	public boolean addLetter(Letter newTile, int index) {
 		if (hand[index] == null) {
-			hand[index] = letter;
+			hand[index] = newTile;
 			return true;
 		}
 		return false;
@@ -103,9 +103,13 @@ public class Hand {
 	 * @return the letter that was removed
 	 */
 	public Letter remove(int index) {
-		Letter l = hand[index];
-		hand[index] = null;
-		return l;
+		try {
+			Letter l = hand[index];
+			hand[index] = null;
+			return l;
+		} catch (Exception e){
+			return null;
+		}
 		
 	}
 	
@@ -138,5 +142,9 @@ public class Hand {
 			str += "  " + i + ". " + message + "\n";
 		}
 		return str;
+	}
+	
+	public Letter[] getList() {
+		return hand;
 	}
 }

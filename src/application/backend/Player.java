@@ -31,13 +31,16 @@ public class Player
 	private Text infoText;
 	private AnimationTimer gameTimer;
 	
+	private boolean swapTile = false;
+	
 	private ScrabbleButton endTurnButton;
 	private ScrabbleButton forfeitTurnButton;
+	private ScrabbleButton swapTileButton;
 	private AnchorPane gamePane;
 	
 	public int locationInTurn = 0;
 	private int index, row, col;
-	int endTurn = -1;
+	int endTurn = -1; 
 	
 	/**
 	 * Constructor for the Player class that creates player with the name given
@@ -133,6 +136,26 @@ public class Player
 		}
 	}
 	
+	private void createSwapTileButton() {
+		try {
+			swapTileButton = new ScrabbleButton("Swap");
+			swapTileButton.setLayoutX(800);
+			swapTileButton.setLayoutY(650);
+			
+			
+			swapTileButton.setOnAction(new EventHandler<ActionEvent>() {
+	
+				@Override
+				public void handle(ActionEvent event) {
+					swapTile = true;
+				}
+			});
+			gamePane.getChildren().add(swapTileButton);
+		} catch (Exception e) { 
+			// Add some handling for if there is already in the gamePane
+		}
+	}
+	
 	
 	
 	
@@ -201,7 +224,7 @@ public class Player
 	 * @return
 	 */
 	
-	private int playTiles (Board board, ArrayList<int[]> locationsOfTurns, ArrayList<Integer> blankIndexes) {
+	private int playTiles (Board board, ArrayList<int[]> locationsOfTurns, ArrayList<Integer> blankIndexes, Pile pile) {
 		if (hand.checkIfEmpty()){ // Lets the player put down the letters onto the board
 			if (endTurn != 1) {
 				if (index == -100) {
@@ -209,14 +232,23 @@ public class Player
 					return -1;
 				}
 				
-				if (index == 9) {
+				if (index == 9 || swapTile) {
 					System.out.println("\nFORFEIT----------------------------------- \n\tYour turn has been forfieted, returning cards to hand! \n ----------------------------------------");
 					locationInTurn = 0;
-					index = -100;
-					removePlayerAssets();
 					returnTilesToHandFromBoard(board, locationsOfTurns, blankIndexes);
+					removePlayerAssets();
+					if (swapTile) {
+						swapTile = false;
+						Letter removed = hand.remove(index);
+						pile.addLetterToPile(removed);
+						Letter newTile = pile.drawTop();
+						hand.addLetter(newTile, index);
+					}
+					index = -100;
 					return 0;
 				}
+				
+				
 				if (hand.getLetterIndex(index) == null) {
 					locationInTurn = 0;
 					System.out.println("\nERROR---------------------------------- \n\tThat tile has already been played\n ----------------------------------------");
@@ -230,9 +262,6 @@ public class Player
 				}
 				
 				this.updateInfoText();
-				
-				// col = readInt(0,14, "Enter the column for the letter to go") ;  // Ask for the x coordinate
-				// row = readInt(0,14, "Enter the row for the letter to go") ; // Ask for the y coordinate
 				
 				if (row == -100 || col == -100) {
 					return -1;
@@ -298,7 +327,7 @@ public class Player
 	}
 	
 	public void updateInfoText() {
-		String indexS = "#", rowS = "#", colS= "#", endTurnS = "No";
+		String indexS = "#", rowS = "#", colS= "#";
 		if (index > -100) { 
 			indexS = "" + index +  " ("+ hand.getLetterIndex(index) +")";
 		} 
@@ -308,9 +337,7 @@ public class Player
 		if (col > -100) {
 			colS = "" + col;
 		}
-		if (endTurn == 1) {
-			endTurnS = "Yes";
-		}
+		
 		infoText.setText(
 				"Score: " + score +
 				"\nIndex: " + indexS +
@@ -367,7 +394,8 @@ public class Player
 	public int takeTurn(Board board, Pile pile, GameViewManager view) {
 		
 		if (locationInTurn == 0) {
-			createEndButton();
+			this.createEndButton();
+			this.createSwapTileButton();
 			this.createForfeitTurnButton();
 			addLettersToScreen();
 			resetVariablesForTurn();
@@ -382,7 +410,7 @@ public class Player
 		
 		if (locationInTurn == 1) {
 			
-				int turnValue = playTiles(board, locationsOfTurns, blankIndexes);
+				int turnValue = playTiles(board, locationsOfTurns, blankIndexes, pile);
 				
 				if (turnValue == 0) {
 					locationInTurn = 0;

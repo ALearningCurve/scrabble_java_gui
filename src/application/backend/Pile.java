@@ -81,6 +81,13 @@ public class Pile {
 	}	
 	
 	/**
+	 * Adds the letter given as arg to back of pile
+	 */
+	
+	public void addLetterToPile (Letter letter) {
+		pile.add(pile.size()-1, letter);
+	}
+	/**
 	 * Gives the size of the pile (how many letters are in it)
 	 * @return int of the size of the pile
 	 */
