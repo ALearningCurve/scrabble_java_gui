@@ -117,7 +117,7 @@ public class Player
 		try {
 			forfeitTurnButton = new ScrabbleButton("Forfeit");
 			forfeitTurnButton.setLayoutX(800);
-			forfeitTurnButton.setLayoutY(800);
+			forfeitTurnButton.setLayoutY(750);
 			
 			
 			forfeitTurnButton.setOnAction(new EventHandler<ActionEvent>() {
@@ -203,58 +203,59 @@ public class Player
 	
 	private int playTiles (Board board, ArrayList<int[]> locationsOfTurns, ArrayList<Integer> blankIndexes) {
 		if (hand.checkIfEmpty()){ // Lets the player put down the letters onto the board
-			if (index == -100) {
+			if (endTurn != 1) {
+				if (index == -100) {
+					this.updateInfoText();
+					return -1;
+				}
+				
+				if (index == 9) {
+					System.out.println("\nFORFEIT----------------------------------- \n\tYour turn has been forfieted, returning cards to hand! \n ----------------------------------------");
+					locationInTurn = 0;
+					index = -100;
+					removePlayerAssets();
+					returnTilesToHandFromBoard(board, locationsOfTurns, blankIndexes);
+					return 0;
+				}
+				if (hand.getLetterIndex(index) == null) {
+					locationInTurn = 0;
+					System.out.println("\nERROR---------------------------------- \n\tThat tile has already been played\n ----------------------------------------");
+					index = -100;
+					return -1;
+					
+				} else if (hand.getLetterIndex(index).getCharacter() == ' ') { // Checks if the letter at that index is a blank, and if so then it sets it to something else
+					System.out.println("You are playing a blank!");
+					hand.getLetterIndex(index).setBlankValue(sc);
+					blankIndexes.add(index);
+				}
+				
 				this.updateInfoText();
-				return -1;
-			}
-			
-			if (index == 9) {
-				System.out.println("\nFORFEIT----------------------------------- \n\tYour turn has been forfieted, returning cards to hand! \n ----------------------------------------");
-				locationInTurn = 0;
-				index = -100;
-				removePlayerAssets();
-				returnTilesToHandFromBoard(board, locationsOfTurns, blankIndexes);
-				return 0;
-			}
-			if (hand.getLetterIndex(index) == null) {
-				locationInTurn = 0;
-				System.out.println("\nERROR---------------------------------- \n\tThat tile has already been played\n ----------------------------------------");
-				index = -100;
-				return -1;
 				
-			} else if (hand.getLetterIndex(index).getCharacter() == ' ') { // Checks if the letter at that index is a blank, and if so then it sets it to something else
-				System.out.println("You are playing a blank!");
-				hand.getLetterIndex(index).setBlankValue(sc);
-				blankIndexes.add(index);
-			}
-			
-			this.updateInfoText();
-			
-			// col = readInt(0,14, "Enter the column for the letter to go") ;  // Ask for the x coordinate
-			// row = readInt(0,14, "Enter the row for the letter to go") ; // Ask for the y coordinate
-			
-			if (row == -100 || col == -100) {
-				return -1;
-			} else {
-				System.out.println("Location set (" +row +col +")");
-			}
-		
-			System.out.println("Checking if tile set");
-			if (board.get(col, row).getStatus() == Location.EMPTY) {// Removes the letter and plays it if there is no letter on that spot
-				Letter letter = hand.remove(index);
-				gamePane.getChildren().remove(letter);
-				board.setLetter(col, row, letter);
+				// col = readInt(0,14, "Enter the column for the letter to go") ;  // Ask for the x coordinate
+				// row = readInt(0,14, "Enter the row for the letter to go") ; // Ask for the y coordinate
 				
-			} else { // If there is a letter on that spot then it tells player and continues
-				System.out.println("\nERROR---------------------------------- \n\tYou cannot play over the same tile!\n ----------------------------------------");
-				col = -100;
-				row = -100;
-				return -1;
+				if (row == -100 || col == -100) {
+					return -1;
+				} else {
+					System.out.println("Location set (" +row +col +")");
+				}
+			
+				System.out.println("Checking if tile set");
+				if (board.get(col, row).getStatus() == Location.EMPTY) {// Removes the letter and plays it if there is no letter on that spot
+					Letter letter = hand.remove(index);
+					gamePane.getChildren().remove(letter);
+					board.setLetter(col, row, letter);
+					
+				} else { // If there is a letter on that spot then it tells player and continues
+					System.out.println("\nERROR---------------------------------- \n\tYou cannot play over the same tile!\n ----------------------------------------");
+					col = -100;
+					row = -100;
+					return -1;
+				}
+				
+				// Updates the hashmap with values of where the tiles have been placed
+				locationsOfTurns.add(new int[]{col, row, index});
 			}
-			
-			// Updates the hashmap with values of where the tiles have been placed
-			locationsOfTurns.add(new int[]{col, row, index});
-			
 			
 			index = -100;
 			row = -100;
@@ -314,8 +315,8 @@ public class Player
 				"Score: " + score +
 				"\nIndex: " + indexS +
 				"\nColmn: " + colS +
-				"\nRow: " + rowS +
-				"\nEnd Turn: " + endTurnS
+				"\nRow: " + rowS 
+				// "\nEnd Turn: " + endTurnS
 				);
 		
 	}
