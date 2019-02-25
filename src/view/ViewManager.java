@@ -70,8 +70,7 @@ public class ViewManager {
 		subScene.moveSubScene();
 	}
 	private void createSubScenes() {
-		creditsSubScene = new ScrabbleSubScene();
-		mainPane.getChildren().add(creditsSubScene);
+		makeCreditsSubScene();
 		
 		makeHelpSubScene();
 		
@@ -82,9 +81,13 @@ public class ViewManager {
 		
 		createShipChooserSubScene();
 	}
+	
 	private void makeHelpSubScene () {
 		helpSubScene = new ScrabbleSubScene();
-		Text helpText = new Text(50,60,"LMAO nerd this is scrabble!");
+		Text helpText = new Text(50,60,"Try to make words from the tiles in your hand and what is on the board \n "
+				+ "-- End turn button ends the turn after your next tile placement\n"
+				+ "-- Forfeit turn puts all the tiles you played in that turn back\n"
+				+ "-- If you make a mistake then the tiles are put back");
 		
 		helpText.setWrappingWidth(500);
 		helpSubScene.getPane().getChildren().add(helpText);
@@ -93,8 +96,29 @@ public class ViewManager {
 		} catch (FileNotFoundException e) {
 			helpText.setFont(Font.font("Verdana", 12));
 		} 
+		
 		mainPane.getChildren().add(helpSubScene);
 	}
+	
+	private void makeCreditsSubScene () {
+		creditsSubScene = new ScrabbleSubScene();
+		Text credText = new Text(50,60,"CREDITS \n\n\n"
+				+ "BACKEND -- William Walling-Sotolongo\n\n"
+				+ "FRONTEND -- William Walling-Sotolongo\n\n"
+				+ "TESET -- Justin Smith\n\n\n\n"
+				);
+		
+		credText.setWrappingWidth(500);
+		creditsSubScene.getPane().getChildren().add(credText);
+		try {
+			credText.setFont(Font.loadFont(new FileInputStream(FONT_PATH), 12));
+		} catch (FileNotFoundException e) {
+			credText.setFont(Font.font("Verdana", 12));
+		} 
+		
+		mainPane.getChildren().add(creditsSubScene);
+	}
+	
 	private void createShipChooserSubScene() {
 		shipChooserScene = new ScrabbleSubScene();
 		mainPane.getChildren().add(shipChooserScene);
@@ -220,7 +244,6 @@ public class ViewManager {
 				showSubScene(creditsSubScene);
 			}
 		});
-	
 	}
 	
 	private void createExitButton() {
