@@ -27,6 +27,7 @@ public class Letter extends Button{
 	public final static int HEIGHT = 45;
 	public final static int WIDTH = 49;
 	
+	public boolean clicked = false;
 	 /**
 	  * This is the constructor for the class, sets character and finds value for that character
 	  * @author 21wwalling-sotolongo
@@ -226,6 +227,7 @@ public class Letter extends Button{
 			public void handle(MouseEvent event) {
 				if (event.getButton().equals(MouseButton.PRIMARY)) {
 					//setButtonPressedStyle();
+					clicked = true;
 				}
 			}
 		});

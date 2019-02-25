@@ -1,8 +1,5 @@
 package application.backend;
 
-
-import javafx.scene.layout.AnchorPane;
-
 /**
  * This is a hand to represent the hand/rack which each player has and will hold/do things with the 
  * letters
@@ -110,6 +107,18 @@ public class Hand {
 		hand[index] = null;
 		return l;
 		
+	}
+	
+	
+	public int checkIfThingsInHandHaveBeenClicked() {
+		int clickedIndex = -1;
+		for (int i =0; i <hand.length; i ++) {
+			if (hand[i] != null && hand[i].clicked) {
+				hand[i].clicked = false;
+				clickedIndex = i;
+			}
+		}
+		return clickedIndex;
 	}
 	/**
 	 * Returns the string representation of a hand object

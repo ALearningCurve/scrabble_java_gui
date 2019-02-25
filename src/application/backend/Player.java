@@ -10,10 +10,13 @@ import javafx.event.EventHandler;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import model.ScrabbleButton;
 import view.GameViewManager;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.*;
 
 public class Player 
@@ -29,12 +32,12 @@ public class Player
 	private AnimationTimer gameTimer;
 	
 	private ScrabbleButton endTurnButton;
+	private ScrabbleButton forfeitTurnButton;
 	private AnchorPane gamePane;
 	
 	public int locationInTurn = 0;
-	private int number = -100;
 	private int index, row, col;
-	boolean endTurn = false;
+	int endTurn = -1;
 	
 	/**
 	 * Constructor for the Player class that creates player with the name given
@@ -54,7 +57,16 @@ public class Player
 		infoText = new Text();
 		infoText.setLayoutX(800);
 		infoText.setLayoutY(100);
+		
+		try {
+			infoText.setFont(Font.loadFont(new FileInputStream("src/model/resources/kenvector_future.ttf"), 10));
+		} catch (FileNotFoundException e) {
+			infoText.setFont(Font.font("Verdana", 10));
+		}
+		
 		gamePane.getChildren().add(infoText);
+		
+		
 	}
 	
 	/**
@@ -78,7 +90,7 @@ public class Player
 	
 	private void createEndButton() {
 		try {
-			endTurn = false;
+			endTurn = -1;
 			endTurnButton = new ScrabbleButton("End Turn");
 			endTurnButton.setLayoutX(800);
 			endTurnButton.setLayoutY(700);
@@ -88,7 +100,11 @@ public class Player
 	
 				@Override
 				public void handle(ActionEvent event) {
-					endTurn = !endTurn;
+					if (endTurn != 1) {
+						endTurn = 1;
+					} else {
+						endTurn = 0;
+					}
 				}
 			});
 			gamePane.getChildren().add(endTurnButton);
@@ -96,6 +112,28 @@ public class Player
 			// Add some handling for if there is already in the gamePane
 		}
 	}
+	
+	private void createForfeitTurnButton() {
+		try {
+			forfeitTurnButton = new ScrabbleButton("Forfeit");
+			forfeitTurnButton.setLayoutX(800);
+			forfeitTurnButton.setLayoutY(800);
+			
+			
+			forfeitTurnButton.setOnAction(new EventHandler<ActionEvent>() {
+	
+				@Override
+				public void handle(ActionEvent event) {
+					index = 9;
+				}
+			});
+			gamePane.getChildren().add(forfeitTurnButton);
+		} catch (Exception e) { 
+			// Add some handling for if there is already in the gamePane
+		}
+	}
+	
+	
 	
 	
 	/**
@@ -111,9 +149,12 @@ public class Player
 		gameTimer = new AnimationTimer() {
 			@Override
 			public void handle(long now) {
-				for (int i=0; i<hand.getLetterList().length; i++) {
-	
+				int handClicked = hand.checkIfThingsInHandHaveBeenClicked();
+				if (handClicked != -1) {
+					index = handClicked;
 				}
+				
+			
 				
 				Integer[] coordinates = board.checkIfAnyLocationClicked();
 				if (coordinates[0] != -1 && coordinates[1] != -1) {
@@ -125,31 +166,20 @@ public class Player
 		gameTimer.start();
 	}
 	
+	// Not used anymore
 	private void createKeyListeners() {
 		gamePane.getScene().setOnKeyPressed(new EventHandler<KeyEvent>() {
 
 			@Override
 			public void handle(KeyEvent event) {
-				if(event.getCode() == KeyCode.DIGIT0) {
-					number = 0;		
+				if(event.getCode() == KeyCode.DIGIT0) {		
 				} else if(event.getCode() == KeyCode.DIGIT1) {
-					number = 1;
 				} else if(event.getCode() == KeyCode.DIGIT2) {
-					number = 2;
 				} else if(event.getCode() == KeyCode.DIGIT3) {
-					number = 3;
 				} else if(event.getCode() == KeyCode.DIGIT4) {
-					number = 4;
 				} else if(event.getCode() == KeyCode.DIGIT5) {
-					number = 5;
 				} else if(event.getCode() == KeyCode.DIGIT6) {
-					number = 6;
-				} else if(event.getCode() == KeyCode.DIGIT7) {
-					number = 7;
-				} else if(event.getCode() == KeyCode.DIGIT8) {
-					number = 8;
 				} else if(event.getCode() == KeyCode.DIGIT9) {
-					number = 9;
 				}
 			}
 		});
@@ -158,7 +188,6 @@ public class Player
 		gamePane.getScene().setOnKeyReleased(new EventHandler<KeyEvent>() {
 			@Override
 			public void handle(KeyEvent event) {
-				number = -100;
 			}
 		});
 		
@@ -174,22 +203,15 @@ public class Player
 	
 	private int playTiles (Board board, ArrayList<int[]> locationsOfTurns, ArrayList<Integer> blankIndexes) {
 		if (hand.checkIfEmpty()){ // Lets the player put down the letters onto the board
-			
-			this.updateInfoText();
-			
-			if (number != -100 && index == -100) {
-				index = number;	
-			} 
-			if (index != -100 && number != -100) {
-				number = -100;
-			} 
 			if (index == -100) {
+				this.updateInfoText();
 				return -1;
 			}
 			
 			if (index == 9) {
 				System.out.println("\nFORFEIT----------------------------------- \n\tYour turn has been forfieted, returning cards to hand! \n ----------------------------------------");
 				locationInTurn = 0;
+				index = -100;
 				removePlayerAssets();
 				returnTilesToHandFromBoard(board, locationsOfTurns, blankIndexes);
 				return 0;
@@ -198,7 +220,6 @@ public class Player
 				locationInTurn = 0;
 				System.out.println("\nERROR---------------------------------- \n\tThat tile has already been played\n ----------------------------------------");
 				index = -100;
-				number = -100;
 				return -1;
 				
 			} else if (hand.getLetterIndex(index).getCharacter() == ' ') { // Checks if the letter at that index is a blank, and if so then it sets it to something else
@@ -212,10 +233,13 @@ public class Player
 			// col = readInt(0,14, "Enter the column for the letter to go") ;  // Ask for the x coordinate
 			// row = readInt(0,14, "Enter the row for the letter to go") ; // Ask for the y coordinate
 			
-			if (row == -100 && col == -100) {
-				return -100;
+			if (row == -100 || col == -100) {
+				return -1;
+			} else {
+				System.out.println("Location set (" +row +col +")");
 			}
 		
+			System.out.println("Checking if tile set");
 			if (board.get(col, row).getStatus() == Location.EMPTY) {// Removes the letter and plays it if there is no letter on that spot
 				Letter letter = hand.remove(index);
 				gamePane.getChildren().remove(letter);
@@ -235,18 +259,19 @@ public class Player
 			index = -100;
 			row = -100;
 			col = -100;
-			number = -100;
 			board.printStatus(true);
 			board.printStatus();
 			
 			// Checks if the user's turn is over or not
-			if (endTurn) {
-				endTurn = false;
+			if (endTurn == 1) {
+				endTurn = -1;
 				locationInTurn = 2;
 				return 9;
-			} else {
+			} else if (endTurn == 0 ){
 				System.out.println("This is now your hand:\n"  + hand );
 				locationInTurn = 1;
+				return -1;
+			} else {
 				return -1;
 			}
 		}
@@ -267,15 +292,14 @@ public class Player
 		index = -100;
 		col = -100;
 		row = -100;
-		number = -100;
-		endTurn = false;
+		endTurn = -1;
 	
 	}
 	
 	public void updateInfoText() {
-		String indexS = "#", rowS = "#", colS= "#";
+		String indexS = "#", rowS = "#", colS= "#", endTurnS = "No";
 		if (index > -100) { 
-			indexS = "" + index;
+			indexS = "" + index +  " ("+ hand.getLetterIndex(index) +")";
 		} 
 		if (row > -100) {
 			rowS = "" + row;
@@ -283,12 +307,15 @@ public class Player
 		if (col > -100) {
 			colS = "" + col;
 		}
+		if (endTurn == 1) {
+			endTurnS = "Yes";
+		}
 		infoText.setText(
 				"Score: " + score +
 				"\nIndex: " + indexS +
 				"\nColmn: " + colS +
 				"\nRow: " + rowS +
-				"\nEnd Turn: " + endTurn
+				"\nEnd Turn: " + endTurnS
 				);
 		
 	}
@@ -313,6 +340,7 @@ public class Player
 			
 		}
 	}
+	
 	
 	private void removePlayerAssets() {
 		removeLettersFromScreen();
@@ -339,6 +367,7 @@ public class Player
 		
 		if (locationInTurn == 0) {
 			createEndButton();
+			this.createForfeitTurnButton();
 			addLettersToScreen();
 			resetVariablesForTurn();
 			locationInTurn = 1;
@@ -368,7 +397,6 @@ public class Player
 				board.printStatus(true);
 				
 				locationInTurn = 2;
-				number = -100;
 				index = -100;
 				col = -100;
 				row = -100;

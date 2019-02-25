@@ -18,7 +18,7 @@ public class GameViewManager {
 	
 	private final static String BACKGROUND_IMAGE = "view/resources/yellow_panel.png";
 	
-	private static final int GAME_HEIGHT = 1392;
+	private static final int GAME_HEIGHT = 1000;
 	private static final int GAME_WIDTH= 1024;
 	
 	private int counter = 0;

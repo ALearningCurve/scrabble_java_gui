@@ -1,6 +1,8 @@
 package view;
 
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,16 +10,18 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
-import javafx.scene.input.MouseEvent;
+//import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundImage;
 import javafx.scene.layout.BackgroundPosition;
 import javafx.scene.layout.BackgroundRepeat;
-import javafx.scene.layout.HBox;
+//import javafx.scene.layout.HBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import model.InfoLabel;
-import model.ShipPicker;
+//import model.ShipPicker;
 import model.ScrabbleButton;
 import model.ScrabbleSubScene;
 
@@ -43,6 +47,8 @@ public class ViewManager {
 	private ScrabbleSubScene sceneToHide;
 	private int choosenNumberOfPlayers = 1;
 	
+	private final String FONT_PATH = "src/model/resources/kenvector_future.ttf";
+
 	
 	public ViewManager() {
 		menuButtons = new ArrayList<>();
@@ -67,8 +73,8 @@ public class ViewManager {
 		creditsSubScene = new ScrabbleSubScene();
 		mainPane.getChildren().add(creditsSubScene);
 		
-		helpSubScene = new ScrabbleSubScene();
-		mainPane.getChildren().add(helpSubScene);
+		makeHelpSubScene();
+		
 		
 		scoresSubScene = new ScrabbleSubScene();
 		mainPane.getChildren().add(scoresSubScene);
@@ -76,7 +82,19 @@ public class ViewManager {
 		
 		createShipChooserSubScene();
 	}
-	
+	private void makeHelpSubScene () {
+		helpSubScene = new ScrabbleSubScene();
+		Text helpText = new Text(50,60,"LMAO nerd this is scrabble!");
+		
+		helpText.setWrappingWidth(500);
+		helpSubScene.getPane().getChildren().add(helpText);
+		try {
+			helpText.setFont(Font.loadFont(new FileInputStream(FONT_PATH), 12));
+		} catch (FileNotFoundException e) {
+			helpText.setFont(Font.font("Verdana", 12));
+		} 
+		mainPane.getChildren().add(helpSubScene);
+	}
 	private void createShipChooserSubScene() {
 		shipChooserScene = new ScrabbleSubScene();
 		mainPane.getChildren().add(shipChooserScene);
