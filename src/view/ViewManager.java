@@ -84,10 +84,10 @@ public class ViewManager {
 	
 	private void makeHelpSubScene () {
 		helpSubScene = new ScrabbleSubScene();
-		Text helpText = new Text(50,60,"Try to make words from the tiles in your hand and what is on the board \n "
-				+ "-- End turn button ends the turn after your next tile placement\n"
-				+ "-- Forfeit turn puts all the tiles you played in that turn back\n"
-				+ "-- If you make a mistake then the tiles are put back");
+		Text helpText = new Text(50,60,"Try to make words from the tiles in your hand and what is on the board \n\n "
+				+ "\t-- End turn button ends the turn after your next tile placement\n"
+				+ "\t-- Forfeit turn puts all the tiles you played in that turn back\n"
+				+ "\t-- If you make a mistake then the tiles are put back");
 		
 		helpText.setWrappingWidth(500);
 		helpSubScene.getPane().getChildren().add(helpText);
@@ -103,9 +103,9 @@ public class ViewManager {
 	private void makeCreditsSubScene () {
 		creditsSubScene = new ScrabbleSubScene();
 		Text credText = new Text(50,60,"CREDITS \n\n\n"
-				+ "BACKEND -- William Walling-Sotolongo\n\n"
-				+ "FRONTEND -- William Walling-Sotolongo\n\n"
-				+ "TESET -- Justin Smith\n\n\n\n"
+				+ "BACKEND ............ William Walling-Sotolongo\n\n"
+				+ "FRONTEND ......... William Walling-Sotolongo\n\n"
+				+ "TESTER .............. Justin Smith\n\n\n\n"
 				);
 		
 		credText.setWrappingWidth(500);
@@ -114,6 +114,16 @@ public class ViewManager {
 			credText.setFont(Font.loadFont(new FileInputStream(FONT_PATH), 12));
 		} catch (FileNotFoundException e) {
 			credText.setFont(Font.font("Verdana", 12));
+		} 
+		
+		Text credTextSmall = new Text(330,350,"Made in Java using JavaFX (Feb 2019)");
+		
+		credTextSmall.setWrappingWidth(500);
+		creditsSubScene.getPane().getChildren().add(credTextSmall);
+		try {
+			credTextSmall.setFont(Font.loadFont(new FileInputStream(FONT_PATH), 8));
+		} catch (FileNotFoundException e) {
+			credTextSmall.setFont(Font.font("Verdana", 5));
 		} 
 		
 		mainPane.getChildren().add(creditsSubScene);
