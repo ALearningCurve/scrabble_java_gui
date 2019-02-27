@@ -41,7 +41,7 @@ public class Hand {
 			}
 		    // can't add to full hand or if there is no spot for the tile to go
 			if (full == true || index == -1) {
-				System.out.println("The hand is already full, nothing can be added!");
+				// System.out.println("The hand is already full, nothing can be added!");
 				return false; // If the list is full, then nothing can be added
 
 			}

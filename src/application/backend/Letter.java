@@ -63,12 +63,12 @@ public class Letter extends Button{
 	  */
 	 public void setBlankValue(Scanner sc) {
 		 if (character != ' ') {
-			 System.out.println("This letter is not a blank! (Now Exiting Selection Process)");
+			 // System.out.println("This letter is not a blank! (Now Exiting Selection Process)");
 			 return;
 		 } 
 		 char newCharacter = ' ';
 		 while (newCharacter == ' ') {
-			System.out.println("Enter a letter!");
+			// System.out.println("Enter a letter!");
 			String input = sc.nextLine(); // Reads the user's input as a string
 			
 			try { // Tries to get a value from the beginning of the string
@@ -76,12 +76,12 @@ public class Letter extends Button{
 				newCharacter = Character.toUpperCase(newCharacter);
 				
 			} catch (IndexOutOfBoundsException  e){ // Catches if there is no user input
-				System.out.println("\nERROR----------------------------------- \n\tMake sure to enter a letter! \n ----------------------------------------");
+				// System.out.println("\nERROR----------------------------------- \n\tMake sure to enter a letter! \n ----------------------------------------");
 				newCharacter = ' ';
 				continue;
 			
 		    } catch (Exception e){	// Catches whatever error the user caused
-				System.out.println("\nERROR----------------------------------- \n\tIllegal character, you must enter a number, you entered \'" + input + "\'\n ----------------------------------------");
+				// System.out.println("\nERROR----------------------------------- \n\tIllegal character, you must enter a number, you entered \'" + input + "\'\n ----------------------------------------");
 				e.printStackTrace(); // Prints out the error
 				newCharacter = ' ';
 				continue;
@@ -90,7 +90,7 @@ public class Letter extends Button{
 			// Check if the number is within the range, if it is -1 then the input doesn't exist as a valid letter
 			// So it will loop back to the beginning of the input finder
 			if (getValue(newCharacter) <= 0) {
-				System.out.println("\nERROR----------------------------------- \n\tYou must enter a letter A-Z!\n ----------------------------------------");
+				// System.out.println("\nERROR----------------------------------- \n\tYou must enter a letter A-Z!\n ----------------------------------------");
 				newCharacter = ' ';
 				continue;
 			}
@@ -159,10 +159,10 @@ public class Letter extends Button{
 			 this.character = character;
 			 this.value = getValue(this.character);
 			 
-			 System.out.println("This blank and has been converted to \'" + this.character + "\' with value " + this.value + "!");
+			 // System.out.println("This blank and has been converted to \'" + this.character + "\' with value " + this.value + "!");
 			 return true;
 		 }
-		 System.out.println("This is not a blank!");
+		 // System.out.println("This is not a blank!");
 		 return false; // This means that the character nor the value are that of a blank, so do nothing
 	 }
 	 

@@ -51,7 +51,7 @@ public class Scrabble {
 	 * Acts as game loop proceding through elements of the game until the game ends
 	 */
 	private void gameLoop() {
-		System.out.println("You have begun to play scrabble! (ver 1) \n\n**To quit enter \"-123\" instead of number input**\n\n");
+		// System.out.println("You have begun to play scrabble! (ver 1) \n\n**To quit enter \"-123\" instead of number input**\n\n");
 		pile = new Pile();  // New Pile object
 		board = new Board(gamePane);  // New Board object
 		makePlayers(); // Makes players
@@ -127,7 +127,7 @@ public class Scrabble {
 				totalScores += adder;
 			} else {
 				locEmptyHand = i;
-				System.out.println(player.getName() + " had cleared their hand");
+				// System.out.println(player.getName() + " had cleared their hand");
 			}
 		}
 		
@@ -138,10 +138,11 @@ public class Scrabble {
 		// sorts the players high to low
 		sort(players);
 	
+		@SuppressWarnings("unused")
 		int counter = 0;
-		System.out.println("----|| RESULTS ||----");
+		// System.out.println("----|| RESULTS ||----");
 		for (int i=0; i<players.length; i++) {
-			System.out.println("\t"+ (i+1) +". " + players[counter].getName() + " with "  + players[counter].getScore());
+			// System.out.println("\t"+ (i+1) +". " + players[counter].getName() + " with "  + players[counter].getScore());
 			counter ++;
 		}
 	}
@@ -154,7 +155,7 @@ public class Scrabble {
 		
 		players = new Player[numPlayers];
 		for (int i=0; i<numPlayers; i++) {
-			System.out.println("Making player [" + (1+i) + "]");
+			// System.out.println("Making player [" + (1+i) + "]");
 			players[i] = new Player(gamePane);
 			players[i].fillHand(pile);
 		}
@@ -174,20 +175,20 @@ public class Scrabble {
 	 * @author 21wwalling-sotolongo
 	 */
 	public boolean playingPhase() {
-		System.out.println("called");
+		// System.out.println("called");
 		if (6 != consecutiveScoreless) { // Loops until the players forfeits 6x or player hand & pile are empty
 			Player player = getPlayerWhooseTurnItIs();
-			System.out.println("Its " + player.getName() + "\'s (" + player.getScore() +" pts.) turn! \n\n" );
+			// System.out.println("Its " + player.getName() + "\'s (" + player.getScore() +" pts.) turn! \n\n" );
 			int playerScore = player.takeTurn(board, pile, view);
 			
 				if (playerScore == 0) {
 					consecutiveScoreless ++;
-					System.out.println("ALERT-----\n " + (6 - consecutiveScoreless) + " forfeits left\n---------");
+					// System.out.println("ALERT-----\n " + (6 - consecutiveScoreless) + " forfeits left\n---------");
 				} else {
 					consecutiveScoreless = 0;
 				}
 				if (!player.getHand().checkIfEmpty() && pile.getSize() == 0) { // If the pile is empty and one of the hands is empty then the game is ended
-					System.out.println("ALERT-----\n " + player.getName() + " has emptied their hand\n---------");
+					// System.out.println("ALERT-----\n " + player.getName() + " has emptied their hand\n---------");
 					return false;
 				}
 			
@@ -217,7 +218,7 @@ public class Scrabble {
         	try (BufferedReader br = new BufferedReader(new FileReader(FILE))) {
         	    for(String line; (line = br.readLine()) != null; ) {
         	        if (line.equals(goal)) {
-        	        	System.out.println("Goal Reached");
+        	        	// System.out.println("Goal Reached");
         	        	return true;
         	        }
         	    }

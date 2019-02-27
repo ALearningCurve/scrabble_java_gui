@@ -62,6 +62,7 @@ public class GameViewManager {
 		
 	}
 	
+	@SuppressWarnings("unused")
 	private void endGame() {
 		game.endGame();
 		paused = true;

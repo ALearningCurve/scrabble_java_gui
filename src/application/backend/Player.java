@@ -147,8 +147,10 @@ public class Player
 	
 				@Override
 				public void handle(ActionEvent event) {
-					swapTile = true;
-				}
+					if (index != -100) {
+						swapTile = true;
+					}
+				}	
 			});
 			gamePane.getChildren().add(swapTileButton);
 		} catch (Exception e) { 
@@ -233,7 +235,7 @@ public class Player
 				}
 				
 				if (index == 9 || swapTile) {
-					System.out.println("\nFORFEIT----------------------------------- \n\tYour turn has been forfieted, returning cards to hand! \n ----------------------------------------");
+					// System.out.println("\nFORFEIT----------------------------------- \n\tYour turn has been forfieted, returning cards to hand! \n ----------------------------------------");
 					locationInTurn = 0;
 					returnTilesToHandFromBoard(board, locationsOfTurns, blankIndexes);
 					removePlayerAssets();
@@ -251,12 +253,12 @@ public class Player
 				
 				if (hand.getLetterIndex(index) == null) {
 					locationInTurn = 0;
-					System.out.println("\nERROR---------------------------------- \n\tThat tile has already been played\n ----------------------------------------");
+					// System.out.println("\nERROR---------------------------------- \n\tThat tile has already been played\n ----------------------------------------");
 					index = -100;
 					return -1;
 					
 				} else if (hand.getLetterIndex(index).getCharacter() == ' ') { // Checks if the letter at that index is a blank, and if so then it sets it to something else
-					System.out.println("You are playing a blank!");
+					System.out.println("\n\nYou are playing a blank!");
 					hand.getLetterIndex(index).setBlankValue(sc);
 					blankIndexes.add(index);
 				}
@@ -266,17 +268,17 @@ public class Player
 				if (row == -100 || col == -100) {
 					return -1;
 				} else {
-					System.out.println("Location set (" +row +col +")");
+					// System.out.println("Location set (" +row +col +")");
 				}
 			
-				System.out.println("Checking if tile set");
+				// System.out.println("Checking if tile set");
 				if (board.get(col, row).getStatus() == Location.EMPTY) {// Removes the letter and plays it if there is no letter on that spot
 					Letter letter = hand.remove(index);
 					gamePane.getChildren().remove(letter);
 					board.setLetter(col, row, letter);
 					
 				} else { // If there is a letter on that spot then it tells player and continues
-					System.out.println("\nERROR---------------------------------- \n\tYou cannot play over the same tile!\n ----------------------------------------");
+					// System.out.println("\nERROR---------------------------------- \n\tYou cannot play over the same tile!\n ----------------------------------------");
 					col = -100;
 					row = -100;
 					return -1;
@@ -298,7 +300,7 @@ public class Player
 				locationInTurn = 2;
 				return 9;
 			} else if (endTurn == 0 ){
-				System.out.println("This is now your hand:\n"  + hand );
+				// System.out.println("This is now your hand:\n"  + hand );
 				locationInTurn = 1;
 				return -1;
 			} else {
@@ -356,7 +358,7 @@ public class Player
 				letterList[i].setLayoutX(200 + i*(Letter.WIDTH + 10));
 				letterList[i].setLayoutY(720);
 			} catch (Exception e) {
-				System.out.println("--------------- \n duplication \n---------------");
+				// System.out.println("--------------- \n duplication \n---------------");
 			}
 		}
 	}
@@ -401,7 +403,7 @@ public class Player
 			resetVariablesForTurn();
 			locationInTurn = 1;
 			
-			System.out.println("This is your hand:\n"  + hand );
+			// System.out.println("This is your hand:\n"  + hand );
 			board.printStatus();
 			board.printStatus(true);
 			
@@ -421,7 +423,7 @@ public class Player
 					// This is if the player decides to quit
 				}
 					
-				System.out.println("\nEnd of turn board:");
+				// System.out.println("\nEnd of turn board:");
 				board.printStatus();
 				board.printStatus(true);
 				
@@ -451,7 +453,7 @@ public class Player
 			}
 			
 			locationInTurn = 0;
-			System.out.println("Score: " + scoreToReturn);
+			// System.out.println("Score: " + scoreToReturn);
 			return scoreToReturn; // Returns the totalScore of the player's move
 		}
 		return -1;
@@ -489,19 +491,19 @@ public class Player
 			
 			// Checks if the last location is in line with the previous
 			if (lastCol != col && lastRow != row) {
-				System.out.println("\nERROR---------------------------------- \n\tThe plays must all be in the same row or column!\n ----------------------------------------");
+				// System.out.println("\nERROR---------------------------------- \n\tThe plays must all be in the same row or column!\n ----------------------------------------");
 				reloop = true;
 			}
 		
 			//  Checks to see if the letter is all by itself
 			if (foundWords[0] == "" && foundWords[1] == "") {
-				System.out.println("\nERROR----------------------------------- \n\tYou have to play the letter next to another letter!\n ----------------------------------------");
+				// System.out.println("\nERROR----------------------------------- \n\tYou have to play the letter next to another letter!\n ----------------------------------------");
 				reloop = true;
 			}
 		}
 		
 		if (reloop) { // If the user put the tiles in an invalid spot then the code will loop to the beginning of the turn and restart/undo the the turn
-			System.out.println("Your played letter will now return to your inventory \nand you will start placing them again!\n");
+			// System.out.println("Your played letter will now return to your inventory \nand you will start placing them again!\n");
 			returnTilesToHandFromBoard(board, locationsOfTurns, blankIndexes);
 			reloop = false;
 			locationInTurn = 0;
@@ -513,7 +515,7 @@ public class Player
 		
 		
 		if (badWords.size() > 0) { // if there are any non real words then tell player the words that don't exist and return them while looping to the top
-			System.out.println("\nERROR----------------------------------- \n\tSome of your words " + badWords + " don't exist! \n ----------------------------------------");
+			// System.out.println("\nERROR----------------------------------- \n\tSome of your words " + badWords + " don't exist! \n ----------------------------------------");
 			returnTilesToHandFromBoard(board, locationsOfTurns, blankIndexes);
 			locationInTurn = 0;
 			return -100;
@@ -532,17 +534,17 @@ public class Player
 	 */
 	private int displayEndOfTurnInfo(ArrayList<String> finalWords) {
 		//	Loops through the words they played and the corresponding values
-		System.out.println("These are the words you played: ");
+		// System.out.println("These are the words you played: ");
 		int adder = 0, totalScore = 0; // Adder for values of letter within each word. totalScore of all the words within the ArrayList<String>
 		for (int i=0; i<finalWords.size(); i++) {
 			adder = 0;
 			for (int k=0; k<finalWords.get(i).length(); k++) {
 				adder += Letter.getValue(finalWords.get(i).charAt(k));
 			}
-			System.out.print("\t" + finalWords.get(i) + " (" + adder +")");
+			// System.out.print("\t" + finalWords.get(i) + " (" + adder +")");
 			totalScore += adder;
 		}
-		System.out.println("\tTotal From Turn: " + totalScore + " (" + ((int) score + (int)totalScore)  +")"); // Print out total score for that turn and the new total score
+		// System.out.println("\tTotal From Turn: " + totalScore + " (" + ((int) score + (int)totalScore)  +")"); // Print out total score for that turn and the new total score
 		score += totalScore; // Update the player's total score
 		return totalScore;
 		
@@ -598,7 +600,7 @@ public class Player
 			word = collection[i];
 			if (word == "") {continue;}
 			for (int k=i+1; k<collection.length; k++) {
-				// System.out.println("Comparing " + word + " + " + collection[k]);
+				// // System.out.println("Comparing " + word + " + " + collection[k]);
 				if (collection[k].equals(word)) {
 					collection[i] = "";
 					repeated = true;
@@ -654,14 +656,14 @@ public class Player
 	 * @author 21wwalling-sotolongo
 	 */
 	private int readInt(int minRange, int maxRange, String message) {
-		System.out.println(message);
+		// System.out.println(message);
 		int index = -1; // Index is equal to what the value the player enters is
 		
 		while (true) {
 			if (maxRange != Integer.MAX_VALUE && minRange != Integer.MIN_VALUE) {
-				System.out.println("Enter a number >= " + minRange + " and <=" + maxRange);
+				// System.out.println("Enter a number >= " + minRange + " and <=" + maxRange);
 			} else {
-				System.out.println("Enter a number");
+				// System.out.println("Enter a number");
 			}
 			// Try to get input, catch if it is a string or something
 			String input = sc.nextLine();
@@ -671,23 +673,23 @@ public class Player
 			} catch (NumberFormatException e){
 				//"\nERROR----------------------------------- \n\tYou have to play the letter next to another letter!\n ----------------------------------------"
 				if (maxRange != Integer.MAX_VALUE && minRange != Integer.MIN_VALUE) {
-					System.out.println("\nERROR----------------------------------- \n\tIllegal character, you must enter a number, you entered " + input + "\n ----------------------------------------");
+					// System.out.println("\nERROR----------------------------------- \n\tIllegal character, you must enter a number, you entered " + input + "\n ----------------------------------------");
 				}
 				index = Integer.MIN_VALUE;
 			}
 			if (index == -123) {
-				System.out.println("\nEXIT----------------------------------- \n\tYou entered the kill code, \n Thanks for playing");
+				// System.out.println("\nEXIT----------------------------------- \n\tYou entered the kill code, \n Thanks for playing");
 				try {
 		            Thread.sleep(2000);
 		        } catch (InterruptedException e) {
 		            e.printStackTrace();
 		        }
-				System.out.println("\n Attempting to exit");
+				// System.out.println("\n Attempting to exit");
 				System.exit(0);
 			}
 			// Check if the number is within the range
 			if (index > maxRange || index < minRange) {
-				System.out.println("\nERROR----------------------------------- \n\tThe number must be between " + minRange + " and " + maxRange +"\n ----------------------------------------");
+				// System.out.println("\nERROR----------------------------------- \n\tThe number must be between " + minRange + " and " + maxRange +"\n ----------------------------------------");
 				continue;
 			}
 			break; // Breaks if nothing is wrong with the user's input

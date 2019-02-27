@@ -47,7 +47,7 @@ public class Location extends Button{
 		setPrefHeight(HEIGHT);
 		setStyle(BUTTON_FREE_STYLE);
 		initializeButtonListeners();
-		// System.out.println(this.getChildren());
+		// // System.out.println(this.getChildren());
 		
 	}
 	

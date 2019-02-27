@@ -32,7 +32,7 @@ public class Board {
 	            grid[col][row].setLayoutY(Location.WIDTH/2 + col * Location.HEIGHT);
 	            grid[col][row].setLayoutX(Location.HEIGHT/2 + row * Location.WIDTH);
 	            gamePane.getChildren().add(grid[col][row]);
-	            // System.out.println(gamePane.getChildren());
+	            // // System.out.println(gamePane.getChildren());
 	        }
 	    }
 	    this.gamePane = gamePane;
@@ -154,16 +154,17 @@ public class Board {
 		// Initialize variable used in loop (saves memory to do it beforehand)
 		Location loc;
 		int stat;
+		@SuppressWarnings("unused")
 		Letter letter;
 		
 		// Print out the header
-		System.out.println("   0  1  2  3  4  5  6  7  8  9 10 11 12 13 14");
+		// System.out.println("   0  1  2  3  4  5  6  7  8  9 10 11 12 13 14");
 		
 		// Loop through the whole grid and print out the information of each location
 		for (int row=0; row<NUM_ROWS; row++){
-			System.out.print(row + " "); // Print out the left-hand pointers
+			// System.out.print(row + " "); // Print out the left-hand pointers
 			if (row < 10) {
-				System.out.print(" ");
+				// System.out.print(" ");
 			}
 	        for (int col=0; col<NUM_COLS; col++){
 	            loc = grid[row][col];
@@ -171,14 +172,14 @@ public class Board {
 	            stat = loc.getStatus();
 	            
 	            if (stat == 0) { // If there is nothing print '-'
-	            	System.out.print('-');
+	            	// System.out.print('-');
 	            } else { // This means that something is at that location, so print that letter
-	            	System.out.print(letter);
+	            	// System.out.print(letter);
 	            }
 	            
-	            System.out.print("  "); //Buffer to make the headers line with what was printed
+	            // System.out.print("  "); //Buffer to make the headers line with what was printed
 	        }
-	        System.out.println(); // Make new line at the end
+	        // System.out.println(); // Make new line at the end
 	    } 
 	}
 	
@@ -259,7 +260,7 @@ public class Board {
 			}
 		}
 		
-		// System.out.println("\nValues:\n	locationValueLeft: " + locationValueLeft + "\n	locationValueRight: " + locationValueRight + "\n	locationValueUp: " + locationValueUp + "\n	locationValueDown: " + locationValueDown); Displays the values of the word finders
+		// // System.out.println("\nValues:\n	locationValueLeft: " + locationValueLeft + "\n	locationValueRight: " + locationValueRight + "\n	locationValueUp: " + locationValueUp + "\n	locationValueDown: " + locationValueDown); Displays the values of the word finders
 		String filler = "";
 		// Generate word from the horizontal coordinates
 		for (int i=locationValueLeft; i<locationValueRight+1; i++) {
