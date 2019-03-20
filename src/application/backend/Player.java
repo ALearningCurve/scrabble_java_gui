@@ -394,7 +394,7 @@ public class Player
 	
 	// 0 is the beginning where the variables are reset and the turn is taken
 	public int takeTurn(Board board, Pile pile, GameViewManager view) {
-		
+		board.printStatus(gamePane);
 		if (locationInTurn == 0) {
 			this.createEndButton();
 			this.createSwapTileButton();

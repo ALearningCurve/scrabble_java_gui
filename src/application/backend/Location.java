@@ -26,6 +26,7 @@ public class Location extends Button{
 	private final String FONT_PATH = "src/model/resources/kenvector_future.ttf";
 	private final String BUTTON_PRESSED_STYLE = "-fx-background-color: transparent; -fx-background-image: url('view/resources/scrabbletiles/scrabble_board_peice_selected.png');";
 	private final String BUTTON_FREE_STYLE = "-fx-background-color: transparent; -fx-background-image: url('view/resources/scrabbletiles/scrabble_board_peice.png');";
+	private final String BUTTON_FULL_STYLE = "-fx-background-color: transparent; -fx-background-image: url('view/resources/scrabbletiles/scrabble_peice.png');";
 	
 	public final static int HEIGHT = 45;
 	public final static int WIDTH = 49;
@@ -53,6 +54,11 @@ public class Location extends Button{
 	
 	public void updateTextOnButton() {
 		setText(this.toString());
+		if (status == 1) {
+			setStyle(BUTTON_FULL_STYLE);
+		} else {
+			setStyle(BUTTON_FREE_STYLE);
+		}
 	}
 	/**
 	 * Resets the values of the location to be EMPTY and have no letter (letter variable set to null)
