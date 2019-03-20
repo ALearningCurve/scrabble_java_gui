@@ -7,9 +7,9 @@ import javafx.scene.layout.AnchorPane;
 import view.GameViewManager;
 
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 public class Scrabble {
 	private Pile pile; // Initialize the pile for the class
@@ -17,7 +17,7 @@ public class Scrabble {
 	private Player[] players;  // Create a list for the players
 	private int numPlayers;
 	private ArrayList<String> playedWords = new ArrayList<String>();
-	public final static String FILE = "src/application/backend/scrabbledictionary/Collins Scrabble Words (2015).txt";
+	public final static String FILE_NAME = "scrabbledictionary/Collins Scrabble Words (2015).txt";
 	
 	private AnchorPane gamePane;
 	private GameViewManager view;
@@ -213,6 +213,7 @@ public class Scrabble {
 	 * @return the boolean value of whether or not the word exists as a real word
 	 */
 	public static boolean isStringARealWord(String goal) {
+		/*
 		goal.toUpperCase();
 		try {
         	try (BufferedReader br = new BufferedReader(new FileReader(FILE))) {
@@ -229,6 +230,34 @@ public class Scrabble {
 				e.printStackTrace();
 			}
         } finally {}
+		return false;
+		*/
+		
+		goal.toUpperCase();
+		
+		
+		
+		try {
+			//System.getProperty("user.dir");
+			InputStream in = Scrabble.class.getResourceAsStream(FILE_NAME);
+		    BufferedReader br = new BufferedReader(new InputStreamReader(in));
+		    
+    	    for(String line; (line = br.readLine()) != null; ) {
+    	        if (line.equals(goal)) {
+    	        	// System.out.println("Goal Reached");
+    	        	return true;
+    	        }
+    	    }
+    	    br.close();
+        	    
+    	} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+       
 		return false;
 	}
 	
